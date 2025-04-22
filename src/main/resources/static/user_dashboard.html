@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RedDrop - Blood Donation Management</title>
+    <meta name="description" content="Blood Donation Management Dashboard" />
+    <meta name="author" content="RedDrop" />
+    <link rel="stylesheet" href="css/user_dashboard.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  </head>
+
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <i class="bi bi-droplet-fill"></i>
+            <h2>RedDrop</h2>
+          </div>
+          <button class="sidebar-toggle mobile-only" id="sidebar-toggle">
+            <i class="bi bi-list"></i>
+          </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+          <ul>
+            <li class="nav-item active">
+              <a href="#dashboard" class="nav-link">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#appointments" class="nav-link">
+                <i class="bi bi-calendar-check"></i>
+                <span>Appointments</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#donation-history" class="nav-link">
+                <i class="bi bi-clock-history"></i>
+                <span>Donation History</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#find-centers" class="nav-link">
+                <i class="bi bi-geo-alt"></i>
+                <span>Find Centers</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#blood-requests" class="nav-link">
+                <i class="bi bi-heart-pulse"></i>
+                <span>Blood Requests</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#health-tips" class="nav-link">
+                <i class="bi bi-journal-medical"></i>
+                <span>Health Tips</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+          <a href="#settings" class="nav-link">
+            <i class="bi bi-gear"></i>
+            <span>Settings</span>
+          </a>
+          <a href="#logout" class="nav-link">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="header-left">
+            <button class="sidebar-toggle desktop-only" id="sidebar-toggle-desktop">
+              <i class="bi bi-list"></i>
+            </button>
+            <h1 class="page-title">Dashboard</h1>
+          </div>
+          <div class="header-right">
+            <div class="search-bar">
+              <i class="bi bi-search"></i>
+              <input type="text" placeholder="Search...">
+            </div>
+            <div class="notifications">
+              <i class="bi bi-bell"></i>
+              <span class="badge">3</span>
+            </div>
+            <div class="user-profile">
+              <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User Profile" class="avatar">
+              <span class="user-name">John Doe</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="dashboard-content">
+          <!-- Stats Cards -->
+          <div class="stats-container">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="bi bi-droplet"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Blood Type</h3>
+                <p class="stat-value">O+</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="bi bi-calendar-check"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Last Donation</h3>
+                <p class="stat-value">15 days ago</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="bi bi-award"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Total Donations</h3>
+                <p class="stat-value">12</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <i class="bi bi-calendar3"></i>
+              </div>
+              <div class="stat-info">
+                <h3>Next Eligible</h3>
+                <p class="stat-value">45 days</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Next Appointment Section -->
+          <div class="row-container">
+            <div class="card appointment-card">
+              <div class="card-header">
+                <h2>Next Appointment</h2>
+                <button class="btn-schedule">Schedule New</button>
+              </div>
+              <div class="card-body">
+                <div class="appointment-details">
+                  <div class="appointment-date">
+                    <div class="calendar-icon">
+                      <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <div class="date-info">
+                      <p class="month">OCT</p>
+                      <p class="day">25</p>
+                    </div>
+                  </div>
+                  <div class="appointment-info">
+                    <h3>Blood Donation Appointment</h3>
+                    <p><i class="bi bi-clock"></i> 10:30 AM - 11:30 AM</p>
+                    <p><i class="bi bi-geo-alt"></i> Central Blood Bank, 123 Health St.</p>
+                  </div>
+                  <div class="appointment-actions">
+                    <button class="btn-reschedule">Reschedule</button>
+                    <button class="btn-cancel">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Blood Requests -->
+            <div class="card requests-card">
+              <div class="card-header">
+                <h2>Urgent Blood Requests</h2>
+                <a href="#all-requests" class="view-all">View All</a>
+              </div>
+              <div class="card-body">
+                <div class="blood-request">
+                  <div class="request-type">A+</div>
+                  <div class="request-details">
+                    <h3>Emergency Request</h3>
+                    <p>City Hospital, 2.5 miles away</p>
+                    <p class="time">Posted 35 minutes ago</p>
+                  </div>
+                  <button class="btn-respond">Respond</button>
+                </div>
+                <div class="blood-request">
+                  <div class="request-type">O-</div>
+                  <div class="request-details">
+                    <h3>Critical Need</h3>
+                    <p>Children's Hospital, 5 miles away</p>
+                    <p class="time">Posted 2 hours ago</p>
+                  </div>
+                  <button class="btn-respond">Respond</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Donation History -->
+          <div class="card donation-history-card">
+            <div class="card-header">
+              <h2>Recent Donation History</h2>
+              <a href="#full-history" class="view-all">View Full History</a>
+            </div>
+            <div class="card-body">
+              <table class="donation-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Blood Type</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Sep 15, 2023</td>
+                    <td>Central Blood Bank</td>
+                    <td>O+</td>
+                    <td>450 ml</td>
+                    <td><span class="status completed">Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td>Jun 12, 2023</td>
+                    <td>Community Drive</td>
+                    <td>O+</td>
+                    <td>450 ml</td>
+                    <td><span class="status completed">Completed</span></td>
+                  </tr>
+                  <tr>
+                    <td>Mar 03, 2023</td>
+                    <td>University Hospital</td>
+                    <td>O+</td>
+                    <td>450 ml</td>
+                    <td><span class="status completed">Completed</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Health Tips -->
+          <div class="card health-tips-card">
+            <div class="card-header">
+              <h2>Donor Health Tips</h2>
+            </div>
+            <div class="card-body tips-container">
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-droplet"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Stay Hydrated</h3>
+                  <p>Drink plenty of water before and after donation to help your body recover quickly.</p>
+                </div>
+              </div>
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-egg-fried"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Eat Iron-Rich Foods</h3>
+                  <p>Include foods like spinach, red meat, and beans in your diet to maintain healthy iron levels.</p>
+                </div>
+              </div>
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-battery-charging"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Rest Properly</h3>
+                  <p>Get a good night's sleep before donation and avoid strenuous activity for 24 hours after.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/user_dashboard.js"></script>
+  </body>
+</html>
