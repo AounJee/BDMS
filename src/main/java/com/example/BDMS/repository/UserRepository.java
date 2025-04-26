@@ -1,6 +1,6 @@
 package com.example.BDMS.repository;
 
-import com.blooddonation.model.User;
+import com.example.BDMS.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

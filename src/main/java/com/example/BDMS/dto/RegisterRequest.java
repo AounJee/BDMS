@@ -5,16 +5,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DonorResponse {
-    private String name;
+public class RegisterRequest {
+    private String firstName;
+    private String lastName;
+    @NotBlank
+    private String username; // Add this
+    private String dob;
+    private String gender;
     private String email;
+    private String password;
     private String bloodType;
-    private LocalDate lastDonationDate;
-    private boolean eligibleToDonate;
 }

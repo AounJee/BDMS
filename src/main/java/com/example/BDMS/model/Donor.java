@@ -1,12 +1,22 @@
 package com.example.BDMS.model;
-
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "donors")
 public class Donor {
     @Id
@@ -23,7 +33,12 @@ public class Donor {
     private LocalDate lastDonationDate;
     
     @Column(nullable = false)
+    @Builder.Default
     private boolean eligibleToDonate = true;
-    
-    // Additional donor-specific fields can be added here
+
+    @Column(columnDefinition = "integer default 0")
+    private Integer totalDonations;
+
+    @OneToMany(mappedBy = "donor")
+    private List<Donation> donations = new ArrayList<>();
 }
