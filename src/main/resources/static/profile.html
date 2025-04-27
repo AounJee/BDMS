@@ -1,0 +1,129 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RedDrop - Profile & Settings</title>
+    <meta name="description" content="User Profile and Settings" />
+    <meta name="author" content="RedDrop" />
+    <link rel="stylesheet" href="css/user_dashboard.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  </head>
+
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <i class="bi bi-droplet-fill"></i>
+            <h2>RedDrop</h2>
+          </div>
+          <button class="sidebar-toggle mobile-only" id="sidebar-toggle">
+            <i class="bi bi-list"></i>
+          </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+          <ul>
+            <li class="nav-item">
+              <a href="/user_dashboard.html" class="nav-link">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/donate_blood.html" class="nav-link">
+                <i class="bi bi-calendar-check"></i>
+                <span>Donate Blood</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/history.html" class="nav-link">
+                <i class="bi bi-clock-history"></i>
+                <span>Donation History</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/health_tips.html" class="nav-link">
+                <i class="bi bi-journal-medical"></i>
+                <span>Health Tips</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+          <a href="/profile.html" class="nav-link active">
+            <i class="bi bi-gear"></i>
+            <span>Settings</span>
+          </a>
+          <a href="#logout" class="nav-link">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="header-left">
+            <button class="sidebar-toggle desktop-only" id="sidebar-toggle-desktop">
+              <i class="bi bi-list"></i>
+            </button>
+            <h1 class="page-title">Profile & Settings</h1>
+          </div>
+          <div class="header-right">
+            <div class="search-bar">
+              <i class="bi bi-search"></i>
+              <input type="text" placeholder="Search...">
+            </div>
+            <div class="notifications">
+              <i class="bi bi-bell"></i>
+              <span class="badge">3</span>
+            </div>
+            <div class="user-profile">
+              <img id="profile-pic-header" src="https://randomuser.me/api/portraits/men/1.jpg" alt="User Profile" class="avatar">
+              <span class="user-name">John Doe</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="dashboard-content">
+          <!-- Profile Card -->
+          <div class="card profile-card">
+            <div class="card-header">
+              <h2>User Profile</h2>
+            </div>
+            <div class="card-body">
+              <div class="profile-details">
+                <div class="profile-pic-section">
+                  <img id="profile-pic" src="https://randomuser.me/api/portraits/men/1.jpg" alt="Profile Picture" class="large-avatar">
+                  <label for="profile-pic-upload" class="btn-schedule">Change Picture</label>
+                  <input type="file" id="profile-pic-upload" accept="image/*" style="display: none;">
+                </div>
+                <div class="profile-info">
+                  <label for="username">Username</label>
+                  <input type="text" id="username" placeholder="Your username" readonly>
+
+                  <label for="email">Email</label>
+                  <input type="email" id="email" placeholder="Your email">
+
+                  <label for="password">Password</label>
+                  <input type="password" id="password" placeholder="••••••••">
+
+                  <button id="save-changes" class="btn-schedule">Save Changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/auth-service.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/sidebar.js"></script>
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'936cfb3f1c134535',t:'MTc0NTc0Mjg3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

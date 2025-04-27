@@ -38,4 +38,9 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Donor donor;
+
+    public void setProfilePicUrl(String profilePicUrl) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setProfilePicUrl'");
+    }
 }

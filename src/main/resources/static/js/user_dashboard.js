@@ -1,7 +1,4 @@
 // DOM Elements
-const sidebar = document.getElementById('sidebar');
-const sidebarToggle = document.getElementById('sidebar-toggle');
-const sidebarToggleDesktop = document.getElementById('sidebar-toggle-desktop');
 const navLinks = document.querySelectorAll('.nav-link');
 
 // Auth Check and Data Loading
@@ -13,8 +10,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (!response.ok) {
-            // window.location.href = '/login.html';
-            // return;
             throw new Error('Not authenticated');
         }
 
@@ -34,29 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Initialize all UI components
 function initUIComponents() {
-    // Toggle sidebar on mobile
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-        });
-    }
-
-    // Toggle sidebar on desktop
-    if (sidebarToggleDesktop) {
-        sidebarToggleDesktop.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            
-            const icon = sidebarToggleDesktop.querySelector('i');
-            if (sidebar.classList.contains('collapsed')) {
-                icon.classList.remove('bi-list');
-                icon.classList.add('bi-list-nested');
-            } else {
-                icon.classList.remove('bi-list-nested');
-                icon.classList.add('bi-list');
-            }
-        });
-    }
-
     // Handle navigation item clicks
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -71,28 +43,8 @@ function initUIComponents() {
                 
                 const linkText = link.querySelector('span').textContent;
                 document.querySelector('.page-title').textContent = linkText;
-                
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('open');
-                }
             }
         });
-    });
-
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', (e) => {
-        if (window.innerWidth <= 768) {
-            if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-                sidebar.classList.remove('open');
-            }
-        }
-    });
-
-    // Responsive adjustments
-    window.addEventListener('resize', () => {
-        if (window.innerWidth <= 768) {
-            sidebar.classList.remove('collapsed');
-        }
     });
 
     // Initialize buttons

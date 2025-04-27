@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RedDrop - Donate Blood</title>
+    <meta name="description" content="Donate Blood and Manage Appointments" />
+    <meta name="author" content="RedDrop" />
+    <link rel="stylesheet" href="css/user_dashboard.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  </head>
+
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <i class="bi bi-droplet-fill"></i>
+            <h2>RedDrop</h2>
+          </div>
+          <button class="sidebar-toggle mobile-only" id="sidebar-toggle">
+            <i class="bi bi-list"></i>
+          </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+          <ul>
+            <li class="nav-item">
+              <a href="/user_dashboard.html" class="nav-link">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item active">
+              <a href="/donate_blood.html" class="nav-link">
+                <i class="bi bi-calendar-check"></i>
+                <span>Donate Blood</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/history.html" class="nav-link">
+                <i class="bi bi-clock-history"></i>
+                <span>Donation History</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/health_tips.html" class="nav-link">
+                <i class="bi bi-journal-medical"></i>
+                <span>Health Tips</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+          <a href="/profile.html" class="nav-link">
+            <i class="bi bi-gear"></i>
+            <span>Settings</span>
+          </a>
+          <a href="#logout" class="nav-link">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="header-left">
+            <button class="sidebar-toggle desktop-only" id="sidebar-toggle-desktop">
+              <i class="bi bi-list"></i>
+            </button>
+            <h1 class="page-title">Donate Blood</h1>
+          </div>
+          <div class="header-right">
+            <div class="search-bar">
+              <i class="bi bi-search"></i>
+              <input type="text" placeholder="Search...">
+            </div>
+            <div class="notifications">
+              <i class="bi bi-bell"></i>
+              <span class="badge">3</span>
+            </div>
+            <div class="user-profile">
+              <img id="profile-pic-header" src="https://randomuser.me/api/portraits/men/1.jpg" alt="User Profile" class="avatar">
+              <span class="user-name">John Doe</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="dashboard-content">
+          <!-- Upcoming Appointments -->
+          <div class="card appointment-card">
+            <div class="card-header">
+              <h2>Upcoming Appointments</h2>
+            </div>
+            <div class="card-body" id="appointments-list">
+              <p>No upcoming appointments.</p>
+            </div>
+          </div>
+
+          <!-- Pending Requests -->
+          <div class="card requests-card">
+            <div class="card-header">
+              <h2>Pending Requests</h2>
+            </div>
+            <div class="card-body" id="pending-requests-list">
+              <p>No pending requests.</p>
+            </div>
+          </div>
+
+          <!-- Blood Donation Requests -->
+          <div class="card requests-card">
+            <div class="card-header">
+              <h2>Blood Donation Requests</h2>
+              <a href="#all-requests" class="view-all">View All</a>
+            </div>
+            <div class="card-body" id="blood-requests-list">
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/auth-service.js"></script>
+    <script src="js/donate_blood.js"></script>
+    <script src="js/sidebar.js"></script>
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'936cfb3d3a36bd46',t:'MTc0NTc0Mjg3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

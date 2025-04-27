@@ -38,7 +38,10 @@ public class SecurityConfig {
                 "/js/**",
                 "/images/**",
                 "/api/auth/register", // Allow registration
-                "/user_dashboard.html"
+                "/user_dashboard.html",
+                "/history.html",
+                "/profile.html",
+                "health_tips.html"
             ).permitAll()
             .requestMatchers("/api/auth/check").authenticated() // Require auth for /check
             .anyRequest().authenticated()

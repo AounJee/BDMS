@@ -1,0 +1,209 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RedDrop - Health Tips</title>
+    <meta name="description" content="Health Tips for Blood Donation" />
+    <meta name="author" content="RedDrop" />
+    <link rel="stylesheet" href="css/user_dashboard.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  </head>
+
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <i class="bi bi-droplet-fill"></i>
+            <h2>RedDrop</h2>
+          </div>
+          <button class="sidebar-toggle mobile-only" id="sidebar-toggle">
+            <i class="bi bi-list"></i>
+          </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+          <ul>
+            <li class="nav-item">
+              <a href="/user_dashboard.html" class="nav-link">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/donate_blood.html" class="nav-link">
+                <i class="bi bi-calendar-check"></i>
+                <span>Donate Blood</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/history.html" class="nav-link">
+                <i class="bi bi-clock-history"></i>
+                <span>Donation History</span>
+              </a>
+            </li>
+            <li class="nav-item active">
+              <a href="/health_tips.html" class="nav-link">
+                <i class="bi bi-journal-medical"></i>
+                <span>Health Tips</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+          <a href="/profile.html" class="nav-link">
+            <i class="bi bi-gear"></i>
+            <span>Settings</span>
+          </a>
+          <a href="#logout" class="nav-link">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="header">
+          <div class="header-left">
+            <button class="sidebar-toggle desktop-only" id="sidebar-toggle-desktop">
+              <i class="bi bi-list"></i>
+            </button>
+            <h1 class="page-title">Health Tips</h1>
+          </div>
+          <div class="header-right">
+            <div class="search-bar">
+              <i class="bi bi-search"></i>
+              <input type="text" placeholder="Search...">
+            </div>
+            <div class="notifications">
+              <i class="bi bi-bell"></i>
+              <span class="badge">3</span>
+            </div>
+            <div class="user-profile">
+              <img id="profile-pic-header" src="https://randomuser.me/api/portraits/men/1.jpg" alt="User Profile" class="avatar">
+              <span class="user-name">John Doe</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="dashboard-content">
+          <!-- Before Donation Tips -->
+          <div class="card health-tips-card">
+            <div class="card-header">
+              <h2>Before Donating Blood</h2>
+            </div>
+            <div class="card-body tips-container">
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-droplet"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Stay Hydrated</h3>
+                  <p>Drink plenty of water in the 24 hours leading up to your donation. Proper hydration helps maintain your blood volume and makes the donation process smoother.</p>
+                </div>
+              </div>
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-egg-fried"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Eat a Balanced Meal</h3>
+                  <p>Have a nutritious meal 2-3 hours before donating. Include iron-rich foods like spinach, red meat, or beans to ensure your hemoglobin levels are adequate.</p>
+                </div>
+              </div>
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-moon"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Get Plenty of Rest</h3>
+                  <p>Ensure you get a good night’s sleep before your donation. Being well-rested helps your body handle the donation process better.</p>
+                </div>
+              </div>
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-x-circle"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Avoid Alcohol and Caffeine</h3>
+                  <p>Refrain from consuming alcohol or excessive caffeine before donating, as they can dehydrate you and affect your blood pressure.</p>
+                </div>
+              </div>
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-shield-check"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Check Your Eligibility</h3>
+                  <p>Ensure you meet the eligibility criteria, such as being in good health, meeting the minimum weight requirement, and not having donated recently (typically 56 days for whole blood).</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- After Donation Tips -->
+          <div class="card health-tips-card">
+            <div class="card-header">
+              <h2>After Donating Blood</h2>
+            </div>
+            <div class="card-body tips-container">
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-cup-straw"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Rehydrate Your Body</h3>
+                  <p>Drink plenty of fluids, such as water or juice, to replenish your blood volume. Avoid alcohol for at least 24 hours after donation.</p>
+                </div>
+              </div>
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-egg"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Eat Nutritious Foods</h3>
+                  <p>Consume a balanced meal rich in iron and vitamins to help your body recover and replenish red blood cells. Foods like leafy greens, eggs, and fruits are ideal.</p>
+                </div>
+              </div>
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-battery-charging"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Rest and Relax</h3>
+                  <p>Take it easy for the rest of the day. Avoid strenuous activities, heavy lifting, or intense exercise for at least 24 hours to allow your body to recover.</p>
+                </div>
+              </div>
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-bandage"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Keep the Bandage On</h3>
+                  <p>Leave the bandage on your arm for at least 4-5 hours to prevent bruising. Keep the area clean and dry to avoid infection.</p>
+                </div>
+              </div>
+              <div class="health-tip">
+                <div class="tip-icon">
+                  <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div class="tip-content">
+                  <h3>Watch for Side Effects</h3>
+                  <p>Monitor for signs of dizziness, fatigue, or bruising. If you feel unwell or notice excessive bleeding, contact a healthcare provider immediately.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/auth-service.js"></script>
+    <script src="js/health_tips.js"></script>
+    <script src="js/sidebar.js"></script>
+  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'936cfb3f0c85afec',t:'MTc0NTc0Mjg3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
