@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initUIComponents();
 });
 
-// Initialize all UI components (reused from user_dashboard.js)
+// Initialize all UI components
 function initUIComponents() {
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -58,15 +58,7 @@ function initUIComponents() {
 
     document.querySelector('.user-profile').addEventListener('click', async (e) => {
         e.preventDefault();
-        try {
-            await fetch('/api/auth/logout', {
-                method: 'POST',
-                credentials: 'include'
-            });
-            window.location.href = '/login.html';
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
+        await AuthService.logout();
     });
 }
 
@@ -97,19 +89,20 @@ async function loadBloodRequests() {
         requests.forEach(request => {
             const requestDiv = document.createElement('div');
             requestDiv.classList.add('blood-request');
+            const postedTime = new Date(request.requestDate).toLocaleString();
+            const urgency = request.urgency.toLowerCase() === 'critical' || request.urgency.toLowerCase() === 'high' ? 'Urgent Request' : 'Standard Request';
             requestDiv.innerHTML = `
                 <div class="request-type">${request.bloodType}</div>
                 <div class="request-details">
-                    <h3>${request.urgency === 'urgent' ? 'Urgent Request' : 'Standard Request'}</h3>
-                    <p>${request.hospital}, ${request.distance} miles away</p>
-                    <p class="time">Posted ${request.postedTime}</p>
+                    <h3>${urgency}</h3>
+                    <p>${request.hospitalName}</p>
+                    <p class="time">Posted ${postedTime}</p>
                 </div>
                 <button class="btn-respond apply-donate" data-request-id="${request.id}">Apply to Donate</button>
             `;
             bloodRequestsList.appendChild(requestDiv);
         });
 
-        // Add event listeners to Apply buttons
         document.querySelectorAll('.apply-donate').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 const requestId = e.target.getAttribute('data-request-id');
@@ -125,7 +118,7 @@ async function loadBloodRequests() {
 // Load pending requests for the user
 async function loadPendingRequests(userId) {
     try {
-        const response = await fetch(`/api/donors/${userId}/pending-requests`, { credentials: 'include' });
+        const response = await fetch(`/api/pending-requests/me`, { credentials: 'include' });
         if (!response.ok) {
             throw new Error('Failed to load pending requests');
         }
@@ -141,11 +134,12 @@ async function loadPendingRequests(userId) {
         pendingRequests.forEach(request => {
             const requestDiv = document.createElement('div');
             requestDiv.classList.add('blood-request');
+            const appliedTime = new Date(request.appliedTime).toLocaleString();
             requestDiv.innerHTML = `
-                <div class="request-type">${request.bloodType}</div>
+                <div class="request-type">${request.bloodRequest.bloodType}</div>
                 <div class="request-details">
-                    <h3>Pending - ${request.hospital}</h3>
-                    <p>Applied: ${request.appliedTime}</p>
+                    <h3>Pending - ${request.bloodRequest.hospitalName}</h3>
+                    <p>Applied: ${appliedTime}</p>
                     <p class="time">Status: ${request.status}</p>
                 </div>
             `;
@@ -160,7 +154,7 @@ async function loadPendingRequests(userId) {
 // Load upcoming appointments for the user
 async function loadAppointments(userId) {
     try {
-        const response = await fetch(`/api/donors/${userId}/appointments`, { credentials: 'include' });
+        const response = await fetch(`/api/appointments/me`, { credentials: 'include' });
         if (!response.ok) {
             throw new Error('Failed to load appointments');
         }
@@ -173,37 +167,46 @@ async function loadAppointments(userId) {
             return;
         }
 
-        appointments.forEach(appointment => {
+        for (const appointment of appointments) {
+            const centerResponse = await fetch(`/api/donation-centers/${appointment.centerId}`, { credentials: 'include' });
+            const center = await centerResponse.json();
             const appointmentDiv = document.createElement('div');
             appointmentDiv.classList.add('appointment-details');
+            const date = new Date(appointment.appointmentDate);
             appointmentDiv.innerHTML = `
                 <div class="appointment-date">
                     <div class="calendar-icon">
                         <i class="bi bi-calendar-check"></i>
                     </div>
                     <div class="date-info">
-                        <p class="month">${appointment.month}</p>
-                        <p class="day">${appointment.day}</p>
+                        <p class="month">${date.toLocaleString('default', { month: 'short' })}</p>
+                        <p class="day">${date.getDate()}</p>
                     </div>
                 </div>
                 <div class="appointment-info">
                     <h3>Blood Donation Appointment</h3>
-                    <p><i class="bi bi-clock"></i> ${appointment.time}</p>
-                    <p><i class="bi bi-geo-alt"></i> ${appointment.hospital}</p>
+                    <p><i class="bi bi-clock"></i> ${date.toLocaleTimeString()}</p>
+                    <p><i class="bi bi-geo-alt"></i> ${center.name}</p>
                 </div>
                 <div class="appointment-actions">
-                    <button class="btn-reschedule">Reschedule</button>
-                    <button class="btn-cancel">Cancel</button>
+                    <button class="btn-reschedule" data-appointment-id="${appointment.id}">Reschedule</button>
+                    <button class="btn-cancel" data-appointment-id="${appointment.id}">Cancel</button>
                 </div>
             `;
             appointmentsList.appendChild(appointmentDiv);
+        }
+
+        document.querySelectorAll('.btn-reschedule').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const appointmentId = e.target.getAttribute('data-appointment-id');
+                await rescheduleAppointment(appointmentId);
+            });
         });
 
-        // Add event listeners for reschedule and cancel buttons
-        document.querySelectorAll('.btn-reschedule, .btn-cancel').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                alert(`${e.target.textContent} button clicked!`);
+        document.querySelectorAll('.btn-cancel').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const appointmentId = e.target.getAttribute('data-appointment-id');
+                await cancelAppointment(appointmentId);
             });
         });
     } catch (error) {
@@ -215,7 +218,7 @@ async function loadAppointments(userId) {
 // Apply to donate blood
 async function applyToDonate(requestId) {
     try {
-        const response = await fetch('/api/donors/apply', {
+        const response = await fetch('/api/pending-requests', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ requestId }),
@@ -225,11 +228,33 @@ async function applyToDonate(requestId) {
         const data = await response.json();
         if (response.ok) {
             alert('Application submitted successfully! Awaiting hospital approval.');
-            // Reload blood requests and pending requests
             await loadBloodRequests();
             await loadPendingRequests(data.userId);
         } else {
             alert(data.message || 'Failed to apply for donation');
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+// Reschedule appointment (placeholder)
+async function rescheduleAppointment(appointmentId) {
+    alert(`Reschedule appointment ${appointmentId} - Implement modal for date selection`);
+}
+
+// Cancel appointment
+async function cancelAppointment(appointmentId) {
+    try {
+        const response = await fetch(`/api/appointments/${appointmentId}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        if (response.ok) {
+            alert('Appointment cancelled successfully');
+            await loadAppointments();
+        } else {
+            alert('Failed to cancel appointment');
         }
     } catch (error) {
         alert('Error: ' + error.message);

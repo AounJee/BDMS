@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         populateUserProfile(user);
+        await loadHealthTips();
     } catch (error) {
         console.error('Auth check failed:', error);
         setTimeout(() => {
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initUIComponents();
 });
 
-// Initialize all UI components (reused from user_dashboard.js)
+// Initialize all UI components
 function initUIComponents() {
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -44,15 +45,7 @@ function initUIComponents() {
 
     document.querySelector('.user-profile').addEventListener('click', async (e) => {
         e.preventDefault();
-        try {
-            await fetch('/api/auth/logout', {
-                method: 'POST',
-                credentials: 'include'
-            });
-            window.location.href = '/login.html';
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
+        await AuthService.logout();
     });
 }
 
@@ -62,4 +55,68 @@ function populateUserProfile(user) {
     if (user.profilePicUrl) {
         document.getElementById('profile-pic-header').src = user.profilePicUrl;
     }
+}
+
+// Load health tips from API
+async function loadHealthTips() {
+    try {
+        const response = await fetch('/api/health-tips', { credentials: 'include' });
+        if (!response.ok) {
+            throw new Error('Failed to load health tips');
+        }
+
+        const tips = await response.json();
+        const tipsContainer = document.querySelector('.tips-container');
+        tipsContainer.innerHTML = '';
+
+        if (tips.length === 0) {
+            tipsContainer.innerHTML = '<p>No health tips available.</p>';
+            return;
+        }
+
+        tips.forEach(tip => {
+            const tipDiv = document.createElement('div');
+            tipDiv.classList.add('health-tip');
+            tipDiv.innerHTML = `
+                <div class="tip-icon">
+                    <i class="bi bi-heart-pulse"></i>
+                </div>
+                <div class="tip-content">
+                    <h3>${tip.title}</h3>
+                    <p>${tip.content}</p>
+                </div>
+            `;
+            tipsContainer.appendChild(tipDiv);
+        });
+    } catch (error) {
+        console.error('Error loading health tips:', error);
+        useSampleHealthTips();
+    }
+}
+
+// Fallback to sample data
+function useSampleHealthTips() {
+    const sampleTips = [
+        { title: 'Stay Hydrated', content: 'Drink plenty of water before and after donation to help your body recover quickly.' },
+        { title: 'Eat Iron-Rich Foods', content: 'Include foods like spinach, red meat, and beans in your diet to maintain healthy iron levels.' },
+        { title: 'Rest Properly', content: 'Get a good night\'s sleep before donation and avoid strenuous activity for 24 hours after.' }
+    ];
+
+    const tipsContainer = document.querySelector('.tips-container');
+    tipsContainer.innerHTML = '';
+
+    sampleTips.forEach(tip => {
+        const tipDiv = document.createElement('div');
+        tipDiv.classList.add('health-tip');
+        tipDiv.innerHTML = `
+            <div class="tip-icon">
+                <i class="bi bi-heart-pulse"></i>
+            </div>
+            <div class="tip-content">
+                <h3>${tip.title}</h3>
+                <p>${tip.content}</p>
+            </div>
+        `;
+        tipsContainer.appendChild(tipDiv);
+    });
 }

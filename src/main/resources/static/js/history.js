@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initUIComponents();
 });
 
-// Initialize all UI components (reused from user_dashboard.js)
+// Initialize all UI components
 function initUIComponents() {
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -45,15 +45,7 @@ function initUIComponents() {
 
     document.querySelector('.user-profile').addEventListener('click', async (e) => {
         e.preventDefault();
-        try {
-            await fetch('/api/auth/logout', {
-                method: 'POST',
-                credentials: 'include'
-            });
-            window.location.href = '/login.html';
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
+        await AuthService.logout();
     });
 }
 
@@ -65,7 +57,7 @@ function populateUserProfile(user) {
 // Load donation history data from API
 async function loadHistoryData(userId) {
     try {
-        const response = await fetch(`/api/donors/${userId}/history`, { credentials: 'include' });
+        const response = await fetch(`/api/donations/me`, { credentials: 'include' });
         if (!response.ok) {
             throw new Error('Failed to load donation history');
         }
@@ -73,25 +65,25 @@ async function loadHistoryData(userId) {
         const history = await response.json();
         const tableBody = document.getElementById('donation-history-table');
 
-        // Clear existing rows
         tableBody.innerHTML = '';
 
-        // Populate table with donation history
-        history.forEach(donation => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${donation.date}</td>
-                <td>${donation.hospital}</td>
-                <td>${donation.bloodType}</td>
-                <td>${donation.amount}</td>
-                <td><span class="status completed">${donation.status}</span></td>
-            `;
-            tableBody.appendChild(row);
-        });
-
-        // If no donations, show a message
         if (history.length === 0) {
             tableBody.innerHTML = '<tr><td colspan="5">No donation history available.</td></tr>';
+            return;
+        }
+
+        for (const donation of history) {
+            const centerResponse = await fetch(`/api/donation-centers/${donation.centerId}`, { credentials: 'include' });
+            const center = await centerResponse.json();
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${new Date(donation.donationDate).toLocaleDateString()}</td>
+                <td>${center.name}</td>
+                <td>${donation.donor.bloodType}</td>
+                <td>${donation.amountMl} ml</td>
+                <td><span class="status ${donation.status.toLowerCase()}">${donation.status}</span></td>
+            `;
+            tableBody.appendChild(row);
         }
     } catch (error) {
         console.error('Error loading donation history:', error);
@@ -99,7 +91,7 @@ async function loadHistoryData(userId) {
     }
 }
 
-// Fallback to sample data if API fails
+// Fallback to sample data
 function useSampleHistoryData() {
     const sampleHistory = [
         { date: 'Sep 15, 2023', hospital: 'Central Blood Bank', bloodType: 'O+', amount: '450 ml', status: 'Completed' },

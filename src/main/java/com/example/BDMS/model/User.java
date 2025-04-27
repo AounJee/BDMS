@@ -43,4 +43,8 @@ public class User {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'setProfilePicUrl'");
     }
+
+    public long getId() {
+        return id;
+    }
 }

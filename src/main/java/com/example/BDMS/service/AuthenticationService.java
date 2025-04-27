@@ -8,20 +8,21 @@ import com.example.BDMS.model.Role;
 import com.example.BDMS.model.User;
 import com.example.BDMS.repository.DonorRepository;
 import com.example.BDMS.repository.UserRepository;
-
 import lombok.RequiredArgsConstructor;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
 
     private final UserRepository userRepository;
     private final DonorRepository donorRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthenticationResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email is already registered.");    
+            throw new RuntimeException("Email is already registered.");
         }
         
         var user = User.builder()
@@ -31,7 +32,7 @@ public class AuthenticationService {
                 .dob(request.getDob())
                 .gender(request.getGender())
                 .email(request.getEmail())
-                .password(request.getPassword()) // Plain text for development
+                .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.DONOR)
                 .build();
 
@@ -55,7 +56,7 @@ public class AuthenticationService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
     
-        if (!user.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
 

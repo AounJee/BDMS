@@ -12,10 +12,15 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(100) NOT NULL UNIQUE,
     dob DATE,
     gender VARCHAR(20),
-    role ENUM('DONOR', 'ADMIN') DEFAULT 'DONOR'
+    role ENUM('DONOR', 'ADMIN') DEFAULT 'DONOR',
+    profile_pic_url VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_email (email),
+    INDEX idx_username (username)
 );
 
--- Donors table (updated with more fields)
+-- Donors table
 CREATE TABLE IF NOT EXISTS donors (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL,
@@ -23,21 +28,27 @@ CREATE TABLE IF NOT EXISTS donors (
     last_donation_date DATE,
     eligible_to_donate BOOLEAN DEFAULT TRUE,
     total_donations INT DEFAULT 0,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    medical_conditions TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id)
 );
 
--- New: Blood Donation Centers table
+-- Donation Centers table
 CREATE TABLE IF NOT EXISTS donation_centers (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     address TEXT NOT NULL,
     city VARCHAR(100) NOT NULL,
+    state VARCHAR(100),
     phone VARCHAR(20),
     email VARCHAR(255),
-    operating_hours TEXT
+    operating_hours TEXT,
+    latitude DECIMAL(9,6),
+    longitude DECIMAL(9,6),
+    INDEX idx_city (city)
 );
 
--- New: Donations table (to track each donation)
+-- Donations table
 CREATE TABLE IF NOT EXISTS donations (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     donor_id BIGINT NOT NULL,
@@ -46,11 +57,14 @@ CREATE TABLE IF NOT EXISTS donations (
     amount_ml INT NOT NULL,
     notes TEXT,
     status ENUM('SCHEDULED', 'COMPLETED', 'CANCELLED') DEFAULT 'SCHEDULED',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (donor_id) REFERENCES donors(id) ON DELETE CASCADE,
-    FOREIGN KEY (center_id) REFERENCES donation_centers(id)
+    FOREIGN KEY (center_id) REFERENCES donation_centers(id),
+    INDEX idx_donor_id (donor_id),
+    INDEX idx_donation_date (donation_date)
 );
 
--- New: Blood Requests table
+-- Blood Requests table
 CREATE TABLE IF NOT EXISTS blood_requests (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     hospital_name VARCHAR(255) NOT NULL,
@@ -60,10 +74,27 @@ CREATE TABLE IF NOT EXISTS blood_requests (
     request_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     contact_name VARCHAR(255),
     contact_phone VARCHAR(20),
-    status ENUM('OPEN', 'FULFILLED', 'EXPIRED') DEFAULT 'OPEN'
+    contact_email VARCHAR(255),
+    status ENUM('OPEN', 'FULFILLED', 'EXPIRED') DEFAULT 'OPEN',
+    notes TEXT,
+    INDEX idx_blood_type (blood_type),
+    INDEX idx_status (status)
 );
 
--- New: Appointments table
+-- Pending Requests table (new)
+CREATE TABLE IF NOT EXISTS pending_requests (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    donor_id BIGINT NOT NULL,
+    blood_request_id BIGINT NOT NULL,
+    applied_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING',
+    FOREIGN KEY (donor_id) REFERENCES donors(id) ON DELETE CASCADE,
+    FOREIGN KEY (blood_request_id) REFERENCES blood_requests(id) ON DELETE CASCADE,
+    INDEX idx_donor_id (donor_id),
+    INDEX idx_blood_request_id (blood_request_id)
+);
+
+-- Appointments table
 CREATE TABLE IF NOT EXISTS appointments (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     donor_id BIGINT NOT NULL,
@@ -71,20 +102,34 @@ CREATE TABLE IF NOT EXISTS appointments (
     appointment_date DATETIME NOT NULL,
     status ENUM('SCHEDULED', 'COMPLETED', 'CANCELLED', 'MISSED') DEFAULT 'SCHEDULED',
     notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (donor_id) REFERENCES donors(id) ON DELETE CASCADE,
-    FOREIGN KEY (center_id) REFERENCES donation_centers(id)
+    FOREIGN KEY (center_id) REFERENCES donation_centers(id),
+    INDEX idx_donor_id (donor_id),
+    INDEX idx_appointment_date (appointment_date)
 );
 
--- New: Health Tips table
+-- Health Tips table
 CREATE TABLE IF NOT EXISTS health_tips (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
-    category VARCHAR(100),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    category ENUM('BEFORE_DONATION', 'AFTER_DONATION', 'GENERAL') NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_category (category)
 );
 
+-- Sample data
 INSERT INTO users (email, password, first_name, last_name, username, dob, gender, role) VALUES
-('aoun@gmail.com', '1234', 'Admin', 'User', 'admin', '1980-01-01', 'Male', 'ADMIN');
+('admin@example.com', '$2a$10$XURPShQ5uSTIJ6zsmQ.6/uwtZF1pO6/kFjS3iU.//gLC4ybiH1nTa', 'Admin', 'User', 'admin', '1980-01-01', 'Male', 'ADMIN');
 
-select * from users;
+INSERT INTO donation_centers (name, address, city, state, phone, email, operating_hours, latitude, longitude) VALUES
+('Central Blood Bank', '123 Health St.', 'Metropolis', 'NY', '555-123-4567', 'contact@centralbb.org', 'Mon-Fri: 8AM-5PM', 40.7128, -74.0060),
+('Community Blood Drive', '456 Wellness Ave.', 'Gotham', 'NJ', '555-987-6543', 'info@communitybd.org', 'Mon-Sat: 9AM-6PM', 40.7357, -74.1724);
+
+INSERT INTO health_tips (title, content, category) VALUES
+('Stay Hydrated', 'Drink plenty of water before and after donation to help your body recover quickly.', 'BEFORE_DONATION'),
+('Eat Iron-Rich Foods', 'Include foods like spinach, red meat, and beans in your diet to maintain healthy iron levels.', 'BEFORE_DONATION'),
+('Rest Properly', 'Get a good night\'s sleep before donation and avoid strenuous activity for 24 hours after.', 'AFTER_DONATION');
