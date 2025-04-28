@@ -15,10 +15,16 @@ public class DonorResponse {
     private Long userId;
     private String name;
     private String email;
+    private String username;
+    private String firstName;
+    private String lastName;
     private String bloodType;
     private LocalDate lastDonationDate;
     private String lastDonationText;
     private String nextEligibleText;
     private int totalDonations;
     private boolean eligibleToDonate;
+    private LocalDate dob;
+    private String gender;
+    private String profilePicUrl;
 }

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RedDrop - Profile Settings</title>
+  <link rel="stylesheet" href="css/admin_dashboard.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar (same as above, with 'Profile Settings' in footer active) -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <i class="bi bi-droplet-fill"></i>
+          <h2>RedDrop</h2>
+        </div>
+        <button class="sidebar-toggle mobile-only" id="sidebar-toggle">
+          <i class="bi bi-list"></i>
+        </button>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item">
+            <a href="/admin_dashboard.html" class="nav-link">
+              <i class="bi bi-speedometer2"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/approve_requests.html" class="nav-link">
+              <i class="bi bi-check-circle"></i>
+              <span>Approve Requests</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/request_blood.html" class="nav-link">
+              <i class="bi bi-droplet"></i>
+              <span>Request Blood</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/donation_history.html" class="nav-link">
+              <i class="bi bi-clock-history"></i>
+              <span>Donation History</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="/profile_settings.html" class="nav-link active">
+          <i class="bi bi-gear"></i>
+          <span>Profile Settings</span>
+        </a>
+        <a href="#logout" class="nav-link">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="header">
+        <div class="header-left">
+          <button class="sidebar-toggle desktop-only" id="sidebar-toggle-desktop">
+            <i class="bi bi-list"></i>
+          </button>
+          <h1 class="page-title">Profile Settings</h1>
+        </div>
+        <div class="header-right">
+          <!-- Placeholder -->
+        </div>
+      </header>
+
+      <div class="dashboard-content">
+        <div class="card">
+          <div class="card-header">
+            <h2>Profile Settings</h2>
+          </div>
+          <div class="card-body">
+            <div class="profile-details">
+              <div class="profile-pic-section">
+                <img id="profile-pic" src="https://via.placeholder.com/120" alt="Profile Picture" class="large-avatar">
+                <input type="file" id="profile-pic-input" accept="image/*">
+              </div>
+              <div class="profile-info">
+                <form id="profile-form">
+                  <label for="name">Name</label>
+                  <input type="text" id="name" value="Admin User">
+
+                  <label for="email">Email</label>
+                  <input type="email" id="email" value="admin@example.com">
+
+                  <label for="password">New Password</label>
+                  <input type="password" id="password">
+
+                  <label for="confirm-password">Confirm Password</label>
+                  <input type="password" id="confirm-password">
+
+                  <button type="submit" class="btn-save">Save Changes</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/profile_settings.js"></script>
+  <script src="js/sidebar.js"></script>
+</body>
+</html>

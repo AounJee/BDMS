@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -24,12 +27,16 @@ public class AuthenticationService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email is already registered.");
         }
+
+        // Parse the dob String into LocalDate
+        LocalDate dob = (request.getDob() != null && !request.getDob().isEmpty()) ?
+                LocalDate.parse(request.getDob(), DateTimeFormatter.ISO_LOCAL_DATE) : null;
         
         var user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .username(request.getUsername())
-                .dob(request.getDob())
+                .dob(dob)  // Now a LocalDate
                 .gender(request.getGender())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))

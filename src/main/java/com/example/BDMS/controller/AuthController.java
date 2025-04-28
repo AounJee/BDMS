@@ -7,6 +7,8 @@ import com.example.BDMS.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -38,13 +40,16 @@ public class AuthController {
                         .body(Map.of("message", "Email already exists"));
             }
 
+            LocalDate dob = (request.getDob() != null && !request.getDob().isEmpty()) ?
+                LocalDate.parse(request.getDob(), DateTimeFormatter.ISO_LOCAL_DATE) : null;
+
             User user = User.builder()
                     .email(request.getEmail())
                     .password(passwordEncoder.encode(request.getPassword()))
                     .firstName(request.getFirstName())
                     .lastName(request.getLastName())
                     .username(request.getUsername())
-                    .dob(request.getDob())
+                    .dob(dob)
                     .gender(request.getGender())
                     .role(Role.DONOR)
                     .build();

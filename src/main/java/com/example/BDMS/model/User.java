@@ -3,6 +3,9 @@ package com.example.BDMS.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")
 @Data
@@ -29,7 +32,9 @@ public class User {
     @Column(nullable = true, unique = true)
     private String username;
 
-    private String dob;
+    @Column(name = "dob")
+    private LocalDate dob;
+
     private String gender;
 
     @Enumerated(EnumType.STRING)
@@ -39,9 +44,32 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Donor donor;
 
+    @Column(name = "profile_pic_url")
+    private String profilePicUrl;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
     public void setProfilePicUrl(String profilePicUrl) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setProfilePicUrl'");
+        this.profilePicUrl = profilePicUrl;
+    }
+
+    public String getProfilePicUrl() {
+        return profilePicUrl;
     }
 
     public long getId() {

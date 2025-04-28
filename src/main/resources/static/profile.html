@@ -1,9 +1,10 @@
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RedDrop - Profile & Settings</title>
-    <meta name="description" content="User Profile and Settings" />
+    <title>RedDrop - Profile Settings</title>
+    <meta name="description" content="Profile Settings for RedDrop" />
     <meta name="author" content="RedDrop" />
     <link rel="stylesheet" href="css/user_dashboard.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
@@ -58,7 +59,7 @@
             <i class="bi bi-gear"></i>
             <span>Settings</span>
           </a>
-          <a href="#logout" class="nav-link">
+          <a href="login.html" class="nav-link">
             <i class="bi bi-box-arrow-right"></i>
             <span>Logout</span>
           </a>
@@ -72,10 +73,10 @@
             <button class="sidebar-toggle desktop-only" id="sidebar-toggle-desktop">
               <i class="bi bi-list"></i>
             </button>
-            <h1 class="page-title">Profile & Settings</h1>
+            <h1 class="page-title">Profile Settings</h1>
           </div>
           <div class="header-right">
-            <div class="search-bar">
+            <!-- <div class="search-bar">
               <i class="bi bi-search"></i>
               <input type="text" placeholder="Search...">
             </div>
@@ -84,36 +85,73 @@
               <span class="badge">3</span>
             </div>
             <div class="user-profile">
-              <img id="profile-pic-header" src="https://randomuser.me/api/portraits/men/1.jpg" alt="User Profile" class="avatar">
+              <img id="profile-pic-header" src="/uploads/default-profile-pic.jpg" alt="User Profile" class="avatar">
               <span class="user-name">John Doe</span>
-            </div>
+            </div> -->
           </div>
         </header>
 
         <div class="dashboard-content">
-          <!-- Profile Card -->
+          <!-- Profile Settings Card -->
           <div class="card profile-card">
             <div class="card-header">
-              <h2>User Profile</h2>
+              <h2>Edit Profile</h2>
             </div>
             <div class="card-body">
+              <div id="message" class="message"></div>
               <div class="profile-details">
                 <div class="profile-pic-section">
-                  <img id="profile-pic" src="https://randomuser.me/api/portraits/men/1.jpg" alt="Profile Picture" class="large-avatar">
-                  <label for="profile-pic-upload" class="btn-schedule">Change Picture</label>
-                  <input type="file" id="profile-pic-upload" accept="image/*" style="display: none;">
+                  <img id="profilePhoto" src="/uploads/default-profile-pic.jpg" alt="Profile Photo" class="large-avatar">
+                  <div>
+                    <label for="photoUpload" class="btn-schedule" style="margin-top: 0.5rem;">Upload New Photo</label>
+                    <input type="file" id="photoUpload" accept="image/*" style="display: none;">
+                  </div>
                 </div>
                 <div class="profile-info">
-                  <label for="username">Username</label>
-                  <input type="text" id="username" placeholder="Your username" readonly>
-
-                  <label for="email">Email</label>
-                  <input type="email" id="email" placeholder="Your email">
-
-                  <label for="password">Password</label>
-                  <input type="password" id="password" placeholder="••••••••">
-
-                  <button id="save-changes" class="btn-schedule">Save Changes</button>
+                  <div>
+                    <label for="username">Username <span style="color: var(--danger);">*</span></label>
+                    <input type="text" id="username" placeholder="Enter your username" required>
+                  </div>
+                  <div>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter your email" readonly>
+                  </div>
+                  <div>
+                    <label for="firstName">First Name <span style="color: var(--danger);">*</span></label>
+                    <input type="text" id="firstName" placeholder="Enter your first name" required>
+                  </div>
+                  <div>
+                    <label for="lastName">Last Name <span style="color: var(--danger);">*</span></label>
+                    <input type="text" id="lastName" placeholder="Enter your last name" required>
+                  </div>
+                  <div>
+                    <label for="bloodType">Blood Type <span style="color: var(--danger);">*</span></label>
+                    <select id="bloodType" required>
+                      <option value="">Select Blood Type</option>
+                      <option value="A+">A+</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B-">B-</option>
+                      <option value="AB+">AB+</option>
+                      <option value="AB-">AB-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob">
+                  </div>
+                  <div>
+                    <label for="gender">Gender</label>
+                    <select id="gender">
+                      <option value="">Select Gender</option>
+                      <option value="MALE">Male</option>
+                      <option value="FEMALE">Female</option>
+                      <option value="OTHER">Other</option>
+                    </select>
+                  </div>
+                  <button class="btn-schedule" onclick="updateProfile()">Update Profile</button>
                 </div>
               </div>
             </div>
@@ -122,8 +160,124 @@
       </main>
     </div>
 
-    <script src="js/auth-service.js"></script>
-    <script src="js/profile.js"></script>
+    <script src="/static/js/auth_service.js"></script>
     <script src="js/sidebar.js"></script>
-  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'936cfb3f1c134535',t:'MTc0NTc0Mjg3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    <script>
+      let userId;
+
+      // Load user profile data on page load
+      document.addEventListener('DOMContentLoaded', async () => {
+        const isAuthenticated = await AuthService.checkAuth();
+        if (!isAuthenticated) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/donors/me/profile', {
+            credentials: 'include'
+          });
+          if (!response.ok) {
+            throw new Error('Failed to fetch profile');
+          }
+          const data = await response.json();
+          userId = data.userId;
+          document.getElementById('username').value = data.username || '';
+          document.getElementById('email').value = data.email || '';
+          document.getElementById('firstName').value = data.firstName || '';
+          document.getElementById('lastName').value = data.lastName || '';
+          document.getElementById('bloodType').value = data.bloodType || '';
+          document.getElementById('dob').value = data.dob || '';
+          document.getElementById('gender').value = data.gender || '';
+          if (data.profilePicUrl) {
+            document.getElementById('profilePhoto').src = `/uploads/${data.profilePicUrl}`;
+            document.getElementById('profile-pic-header').src = `/uploads/${data.profilePicUrl}`;
+          }
+          document.querySelector('.user-name').textContent = `${data.firstName} ${data.lastName}`;
+        } catch (error) {
+          showMessage('Error loading profile: ' + error.message, 'error');
+        }
+
+        // Add event listener for profile picture preview
+        document.getElementById('photoUpload').addEventListener('change', (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              document.getElementById('profilePhoto').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+      });
+
+      // Update profile function with client-side validation
+      async function updateProfile() {
+        const username = document.getElementById('username').value.trim();
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const bloodType = document.getElementById('bloodType').value;
+        const dob = document.getElementById('dob').value;
+        const gender = document.getElementById('gender').value;
+        const photoFile = document.getElementById('photoUpload').files[0];
+
+        // Client-side validation
+        if (!username || !firstName || !lastName || !bloodType) {
+          showMessage('Please fill in all required fields.', 'error');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('firstName', firstName);
+        formData.append('lastName', lastName);
+        formData.append('bloodType', bloodType);
+        formData.append('dob', dob);
+        formData.append('gender', gender);
+        if (photoFile) {
+          formData.append('photo', photoFile);
+        }
+
+        try {
+          const response = await fetch(`/api/donors/${userId}/profile`, {
+            method: 'PUT',
+            body: formData,
+            credentials: 'include'
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.message || 'Failed to update profile');
+          }
+          showMessage('Profile updated successfully!', 'success');
+          if (result.profilePicUrl) {
+            document.getElementById('profilePhoto').src = `/uploads/${result.profilePicUrl}`;
+            document.getElementById('profile-pic-header').src = `/uploads/${result.profilePicUrl}`;
+          }
+        } catch (error) {
+          showMessage('Error updating profile: ' + error.message, 'error');
+        }
+      }
+
+      // Display success/error messages
+      function showMessage(message, type) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.style.padding = '10px';
+        messageDiv.style.marginBottom = '20px';
+        messageDiv.style.borderRadius = '5px';
+        messageDiv.style.fontSize = '14px';
+        messageDiv.style.color = type === 'error' ? '#721c24' : '#155724';
+        messageDiv.style.backgroundColor = type === 'error' ? '#f8d7da' : '#d4edda';
+        messageDiv.textContent = message;
+        setTimeout(() => {
+          messageDiv.textContent = '';
+          messageDiv.style.padding = '';
+          messageDiv.style.marginBottom = '';
+          messageDiv.style.borderRadius = '';
+          messageDiv.style.fontSize = '';
+          messageDiv.style.color = '';
+          messageDiv.style.backgroundColor = '';
+        }, 5000);
+      }
+    </script>
+  </body>
 </html>

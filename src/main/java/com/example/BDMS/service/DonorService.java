@@ -10,10 +10,18 @@ import com.example.BDMS.repository.DonorRepository;
 import com.example.BDMS.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +30,8 @@ public class DonorService {
     private final DonorRepository donorRepository;
     private final UserRepository userRepository;
     private final DonationRepository donationRepository;
+
+    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
 
     public DonorResponse getDonorProfile(Long userId) {
         User user = userRepository.findById(userId)
@@ -40,13 +50,82 @@ public class DonorService {
                 .userId(user.getId())
                 .name(user.getFirstName() + " " + user.getLastName())
                 .email(user.getEmail())
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .bloodType(donor.getBloodType())
                 .lastDonationDate(donor.getLastDonationDate())
                 .lastDonationText(lastDonationText)
                 .nextEligibleText(nextEligibleText)
                 .totalDonations(totalDonations)
                 .eligibleToDonate(donor.isEligibleToDonate())
+                .dob(user.getDob())  // Works because user.getDob() returns LocalDate
+                .gender(user.getGender())
+                .profilePicUrl(user.getProfilePicUrl())
                 .build();
+    }
+
+    public DonorResponse updateProfile(Long userId, String username, String firstName, String lastName,
+                                       String bloodType, String dob, String gender, MultipartFile photo) {
+        // Validate required fields
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
+        if (firstName == null || firstName.trim().isEmpty()) {
+            throw new IllegalArgumentException("First name cannot be empty");
+        }
+        if (lastName == null || lastName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Last name cannot be empty");
+        }
+        if (bloodType == null || bloodType.trim().isEmpty()) {
+            throw new IllegalArgumentException("Blood type cannot be empty");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+        Donor donor = donorRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Donor profile not found for user id: " + userId));
+
+        // Update User entity
+        user.setUsername(username);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        if (dob != null && !dob.isEmpty()) {
+            user.setDob(LocalDate.parse(dob, DateTimeFormatter.ISO_LOCAL_DATE));  // Works because setDob accepts LocalDate
+        } else {
+            user.setDob(null);  // Clear dob if not provided
+        }
+        user.setGender(gender);
+
+        // Handle profile photo upload
+        if (photo != null && !photo.isEmpty()) {
+            try {
+                File uploadDir = new File(UPLOAD_DIR);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+                String originalFilename = photo.getOriginalFilename();
+                if (originalFilename == null || !originalFilename.contains(".")) {
+                    throw new IllegalArgumentException("Invalid file name for profile photo");
+                }
+                String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                String newFilename = UUID.randomUUID().toString() + extension;
+                Path filePath = Paths.get(UPLOAD_DIR, newFilename);
+                Files.write(filePath, photo.getBytes());
+                user.setProfilePicUrl(newFilename);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to upload profile photo: " + e.getMessage());
+            }
+        }
+
+        // Update Donor entity
+        donor.setBloodType(bloodType);
+
+        // Save changes to the database
+        userRepository.save(user);
+        donorRepository.save(donor);
+
+        return getDonorProfile(userId);
     }
 
     private String formatLastDonationDate(LocalDate lastDonationDate) {
