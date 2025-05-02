@@ -91,7 +91,7 @@
               </div>
               <div class="stat-info">
                 <h3>Blood Type</h3>
-                <p class="stat-value">O+</p>
+                <p class="stat-value">-</p>
               </div>
             </div>
             <div class="stat-card">
@@ -100,7 +100,7 @@
               </div>
               <div class="stat-info">
                 <h3>Last Donation</h3>
-                <p class="stat-value">15 days ago</p>
+                <p class="stat-value">-</p>
               </div>
             </div>
             <div class="stat-card">
@@ -109,7 +109,7 @@
               </div>
               <div class="stat-info">
                 <h3>Total Donations</h3>
-                <p class="stat-value">12</p>
+                <p class="stat-value">-</p>
               </div>
             </div>
             <div class="stat-card">
@@ -118,7 +118,7 @@
               </div>
               <div class="stat-info">
                 <h3>Next Eligible</h3>
-                <p class="stat-value">45 days</p>
+                <p class="stat-value">-</p>
               </div>
             </div>
           </div>
@@ -130,55 +130,19 @@
                 <h2>Next Appointment</h2>
                 <button class="btn-schedule">Schedule New</button>
               </div>
-              <div class="card-body">
-                <div class="appointment-details">
-                  <div class="appointment-date">
-                    <div class="calendar-icon">
-                      <i class="bi bi-calendar-check"></i>
-                    </div>
-                    <div class="date-info">
-                      <p class="month">OCT</p>
-                      <p class="day">25</p>
-                    </div>
-                  </div>
-                  <div class="appointment-info">
-                    <h3>Blood Donation Appointment</h3>
-                    <p><i class="bi bi-clock"></i> 10:30 AM - 11:30 AM</p>
-                    <p><i class="bi bi-geo-alt"></i> Central Blood Bank, 123 Health St.</p>
-                  </div>
-                  <div class="appointment-actions">
-                    <button class="btn-reschedule">Reschedule</button>
-                    <button class="btn-cancel">Cancel</button>
-                  </div>
-                </div>
+              <div class="card-body" id="next-appointment">
+                <!-- Will be populated via JavaScript -->
               </div>
             </div>
 
-            <!-- Blood Requests (Removed from sidebar, but keeping this section as is for now) -->
+            <!-- Blood Requests -->
             <div class="card requests-card">
               <div class="card-header">
                 <h2>Urgent Blood Requests</h2>
                 <a href="donate_blood.html" class="view-all">View All</a>
               </div>
-              <div class="card-body">
-                <div class="blood-request">
-                  <div class="request-type">A+</div>
-                  <div class="request-details">
-                    <h3>Emergency Request</h3>
-                    <p>City Hospital, 2.5 miles away</p>
-                    <p class="time">Posted 35 minutes ago</p>
-                  </div>
-                  <button class="btn-respond">Respond</button>
-                </div>
-                <div class="blood-request">
-                  <div class="request-type">O-</div>
-                  <div class="request-details">
-                    <h3>Critical Need</h3>
-                    <p>Children's Hospital, 5 miles away</p>
-                    <p class="time">Posted 2 hours ago</p>
-                  </div>
-                  <button class="btn-respond">Respond</button>
-                </div>
+              <div class="card-body" id="urgent-requests-list">
+                <!-- Will be populated via JavaScript -->
               </div>
             </div>
           </div>
@@ -200,28 +164,8 @@
                     <th>Status</th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr>
-                    <td>Sep 15, 2023</td>
-                    <td>Central Blood Bank</td>
-                    <td>O+</td>
-                    <td>450 ml</td>
-                    <td><span class="status completed">Completed</span></td>
-                  </tr>
-                  <tr>
-                    <td>Jun 12, 2023</td>
-                    <td>Community Drive</td>
-                    <td>O+</td>
-                    <td>450 ml</td>
-                    <td><span class="status completed">Completed</span></td>
-                  </tr>
-                  <tr>
-                    <td>Mar 03, 2023</td>
-                    <td>University Hospital</td>
-                    <td>O+</td>
-                    <td>450 ml</td>
-                    <td><span class="status completed">Completed</span></td>
-                  </tr>
+                <tbody id="recent-donations-list">
+                  <!-- Will be populated via JavaScript -->
                 </tbody>
               </table>
             </div>
@@ -232,34 +176,8 @@
             <div class="card-header">
               <h2>Donor Health Tips</h2>
             </div>
-            <div class="card-body tips-container">
-              <div class="health-tip">
-                <div class="tip-icon">
-                  <i class="bi bi-droplet"></i>
-                </div>
-                <div class="tip-content">
-                  <h3>Stay Hydrated</h3>
-                  <p>Drink plenty of water before and after donation to help your body recover quickly.</p>
-                </div>
-              </div>
-              <div class="health-tip">
-                <div class="tip-icon">
-                  <i class="bi bi-egg-fried"></i>
-                </div>
-                <div class="tip-content">
-                  <h3>Eat Iron-Rich Foods</h3>
-                  <p>Include foods like spinach, red meat, and beans in your diet to maintain healthy iron levels.</p>
-                </div>
-              </div>
-              <div class="health-tip">
-                <div class="tip-icon">
-                  <i class="bi bi-battery-charging"></i>
-                </div>
-                <div class="tip-content">
-                  <h3>Rest Properly</h3>
-                  <p>Get a good night's sleep before donation and avoid strenuous activity for 24 hours after.</p>
-                </div>
-              </div>
+            <div class="card-body tips-container" id="health-tips-list">
+              <!-- Will be populated via JavaScript -->
             </div>
           </div>
         </div>

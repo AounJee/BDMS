@@ -8,15 +8,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Not authenticated');
         }
 
-        // Initialize everything only after authentication is successful
-        initializeNavigation();
         populateUserProfile(user);
         await loadDashboardData(user.id);
+        await loadUrgentRequests();
+        await loadRecentDonations();
+
+        // Poll for updates every 30 seconds
+        setInterval(async () => {
+            await loadUrgentRequests();
+            await loadRecentDonations();
+        }, 30000);
     } catch (error) {
         console.error('Auth check failed:', error);
         setTimeout(() => {
             window.location.href = '/login.html';
-        }, 2000);
+        }, 5000);
     }
 });
 
@@ -230,4 +236,89 @@ function useSampleData() {
     }];
     
     updateAppointmentInfo(sampleAppointments);
+}
+
+// Load urgent blood requests
+async function loadUrgentRequests() {
+    try {
+        const response = await fetch('/api/blood-requests', { credentials: 'include' });
+        if (!response.ok) {
+            throw new Error('Failed to load blood requests');
+        }
+
+        const requests = await response.json();
+        const urgentRequestsList = document.getElementById('urgent-requests-list');
+        urgentRequestsList.innerHTML = '';
+
+        // Filter for urgent requests (High or Critical urgency)
+        const urgentRequests = requests.filter(request => 
+            request.urgency === 'HIGH' || request.urgency === 'CRITICAL'
+        ).slice(0, 3); // Show only top 3 urgent requests
+
+        if (urgentRequests.length === 0) {
+            urgentRequestsList.innerHTML = '<p>No urgent blood requests at the moment.</p>';
+            return;
+        }
+
+        urgentRequests.forEach(request => {
+            const requestDiv = document.createElement('div');
+            requestDiv.classList.add('blood-request');
+            const postedTime = new Date(request.requestDate).toLocaleString();
+            requestDiv.innerHTML = `
+                <div class="request-type">${request.bloodType}</div>
+                <div class="request-details">
+                    <h3>${request.urgency} Need</h3>
+                    <p>${request.hospitalName}</p>
+                    <p class="time">Posted ${postedTime}</p>
+                </div>
+                <button class="btn-respond" onclick="window.location.href='donate_blood.html'">Respond</button>
+            `;
+            urgentRequestsList.appendChild(requestDiv);
+        });
+    } catch (error) {
+        console.error('Error loading urgent requests:', error);
+        document.getElementById('urgent-requests-list').innerHTML = 
+            '<p>Failed to load urgent requests.</p>';
+    }
+}
+
+// Load recent donations
+async function loadRecentDonations() {
+    try {
+        const response = await fetch('/api/donations/me', { credentials: 'include' });
+        if (!response.ok) {
+            throw new Error('Failed to load donations');
+        }
+
+        const donations = await response.json();
+        const recentDonationsList = document.getElementById('recent-donations-list');
+        recentDonationsList.innerHTML = '';
+
+        // Show only the 3 most recent donations
+        const recentDonations = donations.slice(0, 3);
+
+        if (recentDonations.length === 0) {
+            recentDonationsList.innerHTML = '<tr><td colspan="5">No donation history available.</td></tr>';
+            return;
+        }
+
+        for (const donation of recentDonations) {
+            const centerResponse = await fetch(`/api/donation-centers/${donation.centerId}`, { credentials: 'include' });
+            const center = await centerResponse.json();
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${new Date(donation.donationDate).toLocaleDateString()}</td>
+                <td>${center.name}</td>
+                <td>${donation.donor.bloodType}</td>
+                <td>${donation.amountMl} ml</td>
+                <td><span class="status ${donation.status.toLowerCase()}">${donation.status}</span></td>
+            `;
+            recentDonationsList.appendChild(row);
+        }
+    } catch (error) {
+        console.error('Error loading recent donations:', error);
+        document.getElementById('recent-donations-list').innerHTML = 
+            '<tr><td colspan="5">Failed to load donation history.</td></tr>';
+    }
 }

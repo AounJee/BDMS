@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS pending_requests (
     INDEX idx_donor_id (donor_id),
     INDEX idx_blood_request_id (blood_request_id)
 );
-
+select * from pending_requests;
 -- Appointments table
 CREATE TABLE IF NOT EXISTS appointments (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -127,10 +127,14 @@ DELETE from users where id = 4;
 INSERT INTO users (email, password, first_name, last_name, username, dob, gender, role)
 VALUES ('admin@reddrop.com','$2a$10$TR5iy0fnx/4X79N97ZbYVu8LeFsbP8TMvlgu0GtVb2EK9MIW0FWgW','Admin','User','admin','1990-01-01','MALE','ADMIN');
 
+truncate donation_centers;
 INSERT INTO donation_centers (name, address, city, state, phone, email, operating_hours, latitude, longitude) VALUES
 ('Central Blood Bank', '123 Health St.', 'Metropolis', 'NY', '555-123-4567', 'contact@centralbb.org', 'Mon-Fri: 8AM-5PM', 40.7128, -74.0060),
 ('Jamshed Hospital', '123 Health St.', 'Metropolis', 'NY', '555-123-4567', 'contact@centralbb.org', 'Mon-Fri: 8AM-5PM', 40.7128, -74.0060),
+('Bachon wala haspital', '123 Health St.', 'Metropolis', 'NY', '555-123-4567', 'contact@centralbb.org', 'Mon-Fri: 8AM-5PM', 40.7128, -74.0060),
 ('Community Blood Drive', '456 Wellness Ave.', 'Gotham', 'NJ', '555-987-6543', 'info@communitybd.org', 'Mon-Sat: 9AM-6PM', 40.7357, -74.1724);
+
+select* from donation_centers;
 
 INSERT INTO health_tips (title, content, category) VALUES
 ('Stay Hydrated', 'Drink plenty of water before and after donation to help your body recover quickly.', 'BEFORE_DONATION'),
@@ -149,6 +153,16 @@ VALUES
   (1, 1, '2024-05-01 10:00:00', 450, 'First donation', 'COMPLETED', NOW()),
   (1, 2, '2024-04-01 09:30:00', 450, 'Second donation', 'COMPLETED', NOW());
   
+SELECT * FROM donation_centers;
+ select * from blood_requests;
+ select * from appointments;
+ select * from pending_requests;
+ truncate appointments;
+ truncate blood_requests;
+ truncate pending_requests;
+ 
+ select * from blood_requests;
+ 
 INSERT INTO appointments (donor_id, center_id, appointment_date, status, notes)
 VALUES
 (1, 1, DATE_ADD(NOW(), INTERVAL 2 DAY), 'SCHEDULED', 'First appointment'),

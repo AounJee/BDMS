@@ -445,3 +445,220 @@ form input:focus, form select:focus {
     grid-template-columns: 1fr;
   }
 }
+
+/* --- Enhanced Appointment List Styles (donate_blood.html) --- */
+.appointment-card .appointment-details,
+#appointments-list .appointment-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1.2rem;
+  border: 1px solid #f0f0f0;
+}
+
+.appointment-info h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.btn-reschedule, .btn-cancel, .btn-respond {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  transition: background var(--transition), box-shadow var(--transition);
+  box-shadow: 0 1px 4px rgba(255,77,103,0.08);
+}
+.btn-cancel {
+  background: var(--danger);
+}
+.btn-reschedule:hover, .btn-respond:hover {
+  background: var(--primary-dark);
+}
+.btn-cancel:hover {
+  background: #b91c1c;
+}
+
+/* --- Enhanced Health Tips Styles (health_tips.html & dashboard) --- */
+.tips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.health-tip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  padding: 1.3rem 1.2rem 1.1rem 1.2rem;
+  min-width: 220px;
+  max-width: 260px;
+  flex: 1 1 220px;
+  border: 1px solid #f0f0f0;
+  margin-bottom: 0.5rem;
+}
+.tip-icon {
+  font-size: 2.1rem;
+  color: var(--primary-color);
+  margin-bottom: 0.7rem;
+  background: var(--primary-light);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tip-content h3 {
+  font-size: 1.08rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  color: var(--primary-dark);
+}
+.tip-content p {
+  font-size: 0.98rem;
+  color: var(--text-color);
+  margin-bottom: 0.1rem;
+}
+
+/* --- Enhanced Profile Form Styles (profile.html) --- */
+.profile-info {
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.profile-info input, .profile-info select {
+  width: 100%;
+  padding: 0.7rem 1.1rem;
+  margin-bottom: 1.1rem;
+  border: 1.5px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  font-size: 1rem;
+  font-weight: 500;
+  transition: border var(--transition);
+}
+.profile-info input:focus, .profile-info select:focus {
+  border-color: var(--primary-color);
+  background: #fff;
+}
+.btn-schedule, .btn-update-profile {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.7rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1rem;
+  box-shadow: 0 2px 8px rgba(255,77,103,0.08);
+  transition: background var(--transition), box-shadow var(--transition);
+}
+.btn-schedule:hover, .btn-update-profile:hover {
+  background: var(--primary-dark);
+}
+.message.success {
+  color: var(--success);
+  margin-bottom: 1rem;
+}
+.message.error {
+  color: var(--danger);
+  margin-bottom: 1rem;
+}
+
+/* --- Requests and Respond Buttons (donate_blood.html, dashboard) --- */
+.blood-request, .pending-request {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  padding: 1.1rem 1.2rem;
+  margin-bottom: 1rem;
+  border: 1px solid #f0f0f0;
+}
+.request-type {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  background: var(--primary-light);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  margin-right: 1.2rem;
+  min-width: 48px;
+  text-align: center;
+}
+.request-details h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+.request-details p {
+  font-size: 0.97rem;
+  color: var(--text-color);
+  margin-bottom: 0.1rem;
+}
+.btn-respond {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+  box-shadow: 0 1px 4px rgba(255,77,103,0.08);
+}
+.btn-respond:hover {
+  background: var(--primary-dark);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 1200px) {
+  .tips-container {
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  .health-tip {
+    max-width: 100%;
+    min-width: 180px;
+  }
+}
+@media (max-width: 900px) {
+  .profile-info {
+    max-width: 100%;
+  }
+}
+@media (max-width: 768px) {
+  .tips-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .health-tip {
+    max-width: 100%;
+    min-width: 120px;
+  }
+  .appointment-card .appointment-details,
+  #appointments-list .appointment-details,
+  .blood-request, .pending-request {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+}

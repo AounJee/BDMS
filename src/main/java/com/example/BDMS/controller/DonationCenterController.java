@@ -9,12 +9,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/donation-centers")
 @RequiredArgsConstructor
 public class DonationCenterController {
 
     private final DonationCenterRepository donationCenterRepository;
+
+    @GetMapping
+    public ResponseEntity<List<DonationCenter>> getAllDonationCenters() {
+        return ResponseEntity.ok(donationCenterRepository.findAll());
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<DonationCenter> getDonationCenter(@PathVariable Long id) {

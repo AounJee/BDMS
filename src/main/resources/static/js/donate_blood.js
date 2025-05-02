@@ -115,6 +115,8 @@ async function loadBloodRequests() {
     }
 }
 
+let hasPendingRequest = false;
+
 // Load pending requests for the user
 async function loadPendingRequests(userId) {
     try {
@@ -125,6 +127,9 @@ async function loadPendingRequests(userId) {
 
         const pendingRequests = await response.json();
         pendingRequestsList.innerHTML = '';
+
+        // Track if there is any pending request
+        hasPendingRequest = Array.isArray(pendingRequests) && pendingRequests.some(r => r.status === "PENDING");
 
         if (pendingRequests.length === 0) {
             pendingRequestsList.innerHTML = '<p>No pending requests.</p>';
@@ -148,6 +153,7 @@ async function loadPendingRequests(userId) {
     } catch (error) {
         console.error('Error loading pending requests:', error);
         pendingRequestsList.innerHTML = '<p>Failed to load pending requests.</p>';
+        hasPendingRequest = false;
     }
 }
 
@@ -189,19 +195,12 @@ async function loadAppointments(userId) {
                     <p><i class="bi bi-geo-alt"></i> ${center.name}</p>
                 </div>
                 <div class="appointment-actions">
-                    <button class="btn-reschedule" data-appointment-id="${appointment.id}">Reschedule</button>
                     <button class="btn-cancel" data-appointment-id="${appointment.id}">Cancel</button>
                 </div>
+                <div class="appointment-status ${appointment.status.toLowerCase()}">${appointment.status}</div>
             `;
             appointmentsList.appendChild(appointmentDiv);
         }
-
-        document.querySelectorAll('.btn-reschedule').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const appointmentId = e.target.getAttribute('data-appointment-id');
-                await rescheduleAppointment(appointmentId);
-            });
-        });
 
         setupCancelButtons();
     } catch (error) {
@@ -212,6 +211,10 @@ async function loadAppointments(userId) {
 
 // Apply to donate blood
 async function applyToDonate(requestId) {
+    if (hasPendingRequest) {
+        alert('You already have a pending request. You cannot apply for another until it is resolved.');
+        return;
+    }
     try {
         const response = await fetch('/api/pending-requests', {
             method: 'POST',
@@ -231,11 +234,6 @@ async function applyToDonate(requestId) {
     } catch (error) {
         alert('Error: ' + error.message);
     }
-}
-
-// Reschedule appointment (placeholder)
-async function rescheduleAppointment(appointmentId) {
-    alert(`Reschedule appointment ${appointmentId} - Implement modal for date selection`);
 }
 
 // Modal HTML for confirmation

@@ -37,11 +37,18 @@ public class PendingRequestService {
         return pendingRequestRepository.findByDonorId(donor.getId());
     }
 
-    public void applyToRequest(Long requestId,String email) {
+    public void applyToRequest(Long requestId, String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Donor donor = donorRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new RuntimeException("Donor not found"));
+
+        // Enforce only one pending request per donor
+        boolean hasPending = pendingRequestRepository.existsByDonorIdAndStatus(donor.getId(), "PENDING");
+        if (hasPending) {
+            throw new RuntimeException("You already have a pending request.");
+        }
+
         BloodRequest request = bloodRequestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Request not found"));
         if (!donor.getBloodType().equals(request.getBloodType())) {
