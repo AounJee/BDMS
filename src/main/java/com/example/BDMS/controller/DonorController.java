@@ -17,11 +17,13 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/donors")
@@ -51,24 +53,16 @@ public class DonorController {
         return ResponseEntity.ok(donorService.getDonorProfile(user.getId()));
     }
 
-    @PutMapping("/{userId}/profile")
-    public ResponseEntity<Map<String, String>> updateProfile(
-            @PathVariable Long userId,
-            @RequestParam("username") String username,
-            @RequestParam("firstName") String firstName,
-            @RequestParam("lastName") String lastName,
-            @RequestParam("bloodType") String bloodType,
-            @RequestParam(value = "dob", required = false) String dob,
-            @RequestParam(value = "gender", required = false) String gender,
-            @RequestParam(value = "photo", required = false) MultipartFile photo,
-            Principal principal) {
-        User user = userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        if (user.getId() != userId) {
-            return ResponseEntity.status(403).body(Map.of("message", "Unauthorized"));
-        }
-        DonorResponse updatedProfile = donorService.updateProfile(userId, username, firstName, lastName, bloodType, dob, gender, photo);
-        return ResponseEntity.ok(Map.of("message", "Profile updated successfully", "profilePicUrl", updatedProfile.getProfilePicUrl() != null ? updatedProfile.getProfilePicUrl() : ""));
+    @PutMapping("/{userId}")
+    public ResponseEntity<DonorResponse> updateProfile(@PathVariable Long userId,
+                                                     @RequestParam String username,
+                                                     @RequestParam String firstName,
+                                                     @RequestParam String lastName,
+                                                     @RequestParam String bloodType,
+                                                     @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate dob,
+                                                     @RequestParam String gender) {
+        DonorResponse updatedProfile = donorService.updateProfile(userId, username, firstName, lastName, bloodType, dob, gender);
+        return ResponseEntity.ok(updatedProfile);
     }
 
     @GetMapping("/{userId}/stats")
@@ -118,6 +112,43 @@ public class DonorController {
                     .orElseThrow(() -> new ResourceNotFoundException("User not found"));
             pendingRequestService.applyToRequest(body.get("requestId"), principal.getName());
             return ResponseEntity.ok(Map.of("message", "Application submitted", "userId", user.getId()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{userId}/profile")
+    public ResponseEntity<?> updateDonorProfile(@PathVariable Long userId, @RequestBody Map<String, Object> payload, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (user.getId() != userId) {
+            return ResponseEntity.status(403).body(Map.of("message", "Forbidden"));
+        }
+        try {
+            String username = (String) payload.get("username");
+            String firstName = (String) payload.get("firstName");
+            String lastName = (String) payload.get("lastName");
+            String bloodType = (String) payload.get("bloodType");
+            String dobStr = (String) payload.get("dob");
+            String gender = (String) payload.get("gender");
+            LocalDate dob = null;
+            if (dobStr != null && !dobStr.isEmpty()) {
+                dob = LocalDate.parse(dobStr);
+            }
+            DonorResponse updatedProfile = donorService.updateProfile(userId, username, firstName, lastName, bloodType, dob, gender);
+
+            // Remove pending requests that do not match the new blood type
+            List<PendingRequest> pendingRequests = pendingRequestService.getUserPendingRequests(user.getEmail());
+            for (PendingRequest req : pendingRequests) {
+                if (!bloodType.equals(req.getBloodRequest().getBloodType())) {
+                    pendingRequestService.deletePendingRequest(req.getId());
+                }
+            }
+
+            return ResponseEntity.ok(Map.of(
+                "message", "Profile updated successfully!",
+                "profile", updatedProfile
+            ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }

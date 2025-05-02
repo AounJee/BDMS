@@ -16,4 +16,12 @@ public class BloodRequestService {
     public List<BloodRequest> getAllOpenRequests() {
         return bloodRequestRepository.findByStatus("OPEN");
     }
+
+    public List<BloodRequest> getAllRequests() {
+        return bloodRequestRepository.findAll();
+    }
+
+    public void createRequest(BloodRequest request) {
+        bloodRequestRepository.save(request);
+    }
 }

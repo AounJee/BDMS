@@ -1,30 +1,35 @@
 package com.example.BDMS.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.example.BDMS.model.Donor;
+import com.example.BDMS.model.User;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDate;
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class DonorResponse {
-    private Long userId;
-    private String name;
+    private Long id;
     private String email;
     private String username;
     private String firstName;
     private String lastName;
-    private String bloodType;
-    private LocalDate lastDonationDate;
-    private String lastDonationText;
-    private String nextEligibleText;
-    private int totalDonations;
-    private boolean eligibleToDonate;
     private LocalDate dob;
     private String gender;
-    private String profilePicUrl;
+    private String bloodType;
+    private LocalDate lastDonationDate;
+    private Boolean eligibleToDonate;
+    private Integer totalDonations;
+
+    public DonorResponse(User user, Donor donor) {
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.username = user.getUsername();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.dob = user.getDob();
+        this.gender = user.getGender();
+        this.bloodType = donor.getBloodType();
+        this.lastDonationDate = donor.getLastDonationDate();
+        this.eligibleToDonate = donor.getEligibleToDonate();
+        this.totalDonations = donor.getTotalDonations();
+    }
 }

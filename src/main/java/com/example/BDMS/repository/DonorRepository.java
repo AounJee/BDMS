@@ -10,13 +10,10 @@ import java.util.*;
 
 public interface DonorRepository extends JpaRepository<Donor, Long> {
     
-    // Existing method
-    Optional<Donor> findByUserEmail(String email);
-    
     // New methods needed
     Optional<Donor> findByUserId(Long userId);
     
-    @Query("SELECT COUNT(d) FROM Donation d WHERE d.donor.user.id = :userId")
+    @Query("SELECT d.totalDonations FROM Donor d WHERE d.userId = :userId")
     int countDonationsByUserId(@Param("userId") Long userId);
 
     @Modifying

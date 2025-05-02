@@ -24,10 +24,16 @@ document.addEventListener("DOMContentLoaded", function () {
             username: document.getElementById("username").value,
             dob: document.getElementById("dob").value,
             gender: document.getElementById("gender").value,
+            bloodType: document.getElementById("bloodType").value,
             email: document.getElementById("signupEmail").value,
-            password: document.getElementById("signupPassword").value,
-            bloodType: document.getElementById("bloodType")?.value || "A+"
+            password: document.getElementById("signupPassword").value
         };
+
+        // Validate required fields
+        if (!formData.bloodType) {
+            alert("Please select your blood type!");
+            return;
+        }
 
         if (formData.password !== document.getElementById("confirmPassword").value) {
             alert("Passwords don't match!");
@@ -37,15 +43,17 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             const response = await fetch("/api/auth/register", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify(formData),
                 credentials: 'include'
             });
 
             const data = await response.json();
             if (response.ok) {
-                alert("Signup successful! Please login.");
-                btnLogin.click();
+                alert("Registration successful! Please login.");
+                btnLogin.click(); // Switch to login panel
             } else {
                 alert(data.message || "Registration failed");
             }

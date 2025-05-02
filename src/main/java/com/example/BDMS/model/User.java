@@ -41,12 +41,6 @@ public class User {
     @Column(nullable = true)
     private Role role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Donor donor;
-
-    @Column(name = "profile_pic_url")
-    private String profilePicUrl;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -62,14 +56,6 @@ public class User {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-
-    public void setProfilePicUrl(String profilePicUrl) {
-        this.profilePicUrl = profilePicUrl;
-    }
-
-    public String getProfilePicUrl() {
-        return profilePicUrl;
     }
 
     public long getId() {

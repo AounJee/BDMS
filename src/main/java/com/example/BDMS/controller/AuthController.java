@@ -3,7 +3,9 @@ package com.example.BDMS.controller;
 import com.example.BDMS.dto.RegisterRequest;
 import com.example.BDMS.model.Role;
 import com.example.BDMS.model.User;
+import com.example.BDMS.model.Donor;
 import com.example.BDMS.repository.UserRepository;
+import com.example.BDMS.repository.DonorRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.security.Principal;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.format.annotation.DateTimeFormat;
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:5000", allowCredentials = "true")
@@ -29,41 +32,58 @@ import org.springframework.web.multipart.MultipartFile;
 public class AuthController {
 
     private final UserRepository userRepository;
+    private final DonorRepository donorRepository;
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> registerUser(@RequestBody RegisterRequest request) {
         try {
-            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-                return ResponseEntity
-                        .badRequest()
-                        .body(Map.of("message", "Email already exists"));
+            // Validate blood type
+            if (request.getBloodType() == null || request.getBloodType().isEmpty()) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Blood type is required"));
             }
 
-            LocalDate dob = (request.getDob() != null && !request.getDob().isEmpty()) ?
-                LocalDate.parse(request.getDob(), DateTimeFormatter.ISO_LOCAL_DATE) : null;
+            // Check if email exists
+            User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+            if (user != null) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of("message", "Email already exists"));
+            }
 
-            User user = User.builder()
+            // Parse DOB
+            LocalDate dobParsed = (request.getDob() != null && !request.getDob().isEmpty()) ?
+                    LocalDate.parse(request.getDob(), DateTimeFormatter.ISO_LOCAL_DATE) : null;
+
+            // Create and save user
+            User newUser = User.builder()
                     .email(request.getEmail())
                     .password(passwordEncoder.encode(request.getPassword()))
                     .firstName(request.getFirstName())
                     .lastName(request.getLastName())
                     .username(request.getUsername())
-                    .dob(dob)
+                    .dob(dobParsed)
                     .gender(request.getGender())
-                    .role(Role.DONOR)
+                    .role(Role.DONOR) // Always set to DONOR for website registrations
                     .build();
 
-            userRepository.save(user);
+            userRepository.save(newUser);
+
+            // Create and save donor record
+            Donor donor = new Donor();
+            donor.setUserId(newUser.getId());
+            donor.setBloodType(request.getBloodType());
+            donor.setEligibleToDonate(true);
+            donor.setTotalDonations(0);
+            donorRepository.save(donor);
 
             return ResponseEntity.ok(Map.of(
                 "message", "Registration successful",
-                "userId", user.getId()
+                "userId", newUser.getId()
             ));
         } catch (Exception e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(Map.of("message", e.getMessage()));
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", e.getMessage()));
         }
     }
 
@@ -80,40 +100,29 @@ public class AuthController {
     }
 
     @PostMapping("/update")
-public ResponseEntity<?> updateProfile(
-        @RequestParam("email") String email,
-        @RequestParam("username") String username,
-        @RequestParam(value = "password", required = false) String password,
-        @RequestParam(value = "profilePic", required = false) MultipartFile profilePic,
-        Principal principal) {
-    try {
-        if (principal == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public ResponseEntity<?> updateProfile(
+            @RequestParam("email") String email,
+            @RequestParam("username") String username,
+            @RequestParam(value = "password", required = false) String password,
+            Principal principal) {
+        try {
+            if (principal == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            User user = userRepository.findByEmail(principal.getName())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            user.setEmail(email);
+            user.setUsername(username);
+            if (password != null && !password.isEmpty()) {
+                user.setPassword(passwordEncoder.encode(password));
+            }
+
+            userRepository.save(user);
+            return ResponseEntity.ok(Map.of("message", "Profile updated successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
-
-        User user = userRepository.findByEmail(principal.getName())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        user.setEmail(email);
-        user.setUsername(username);
-        if (password != null && !password.isEmpty()) {
-            user.setPassword(passwordEncoder.encode(password));
-        }
-        if (profilePic != null && !profilePic.isEmpty()) {
-            // Save the file and update profilePicUrl (implementation depends on your file storage solution)
-            String profilePicUrl = saveProfilePicture(profilePic); // Implement this method
-            user.setProfilePicUrl(profilePicUrl);
-        }
-
-        userRepository.save(user);
-        return ResponseEntity.ok(Map.of("message", "Profile updated successfully"));
-    } catch (Exception e) {
-        return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-    }
-}
-
-    private String saveProfilePicture(MultipartFile profilePic) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'saveProfilePicture'");
     }
 }

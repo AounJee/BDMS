@@ -36,4 +36,23 @@ public class DonationService {
                 })
                 .collect(Collectors.toList());
     }
+
+    public long countAllDonations() {
+        return donationRepository.count();
+    }
+
+    public List<Donation> getAllDonations() {
+        List<Donation> donations = donationRepository.findAll();
+        for (Donation donation : donations) {
+            Donor donor = donation.getDonor();
+            if (donor != null) {
+                // Fetch the user for the donor
+                User user = userRepository.findById(donor.getUserId()).orElse(null);
+                if (user != null) {
+                    donation.setDonorName(user.getFirstName() + " " + user.getLastName());
+                }
+            }
+        }
+        return donations;
+    }
 }

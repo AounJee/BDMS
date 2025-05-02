@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS users (
     dob DATE,
     gender VARCHAR(20),
     role ENUM('DONOR', 'ADMIN') DEFAULT 'DONOR',
-    profile_pic_url VARCHAR(255),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_email (email),
@@ -121,15 +120,36 @@ CREATE TABLE IF NOT EXISTS health_tips (
     INDEX idx_category (category)
 );
 
+SELECT * from users;
+SELECT * from donors;
+DELETE from users where id = 4;
 -- Sample data
-INSERT INTO users (email, password, first_name, last_name, username, dob, gender, role) VALUES
-('admin@example.com', '$2a$10$XURPShQ5uSTIJ6zsmQ.6/uwtZF1pO6/kFjS3iU.//gLC4ybiH1nTa', 'Admin', 'User', 'admin', '1980-01-01', 'Male', 'ADMIN');
+INSERT INTO users (email, password, first_name, last_name, username, dob, gender, role)
+VALUES ('admin@reddrop.com','$2a$10$TR5iy0fnx/4X79N97ZbYVu8LeFsbP8TMvlgu0GtVb2EK9MIW0FWgW','Admin','User','admin','1990-01-01','MALE','ADMIN');
 
 INSERT INTO donation_centers (name, address, city, state, phone, email, operating_hours, latitude, longitude) VALUES
 ('Central Blood Bank', '123 Health St.', 'Metropolis', 'NY', '555-123-4567', 'contact@centralbb.org', 'Mon-Fri: 8AM-5PM', 40.7128, -74.0060),
+('Jamshed Hospital', '123 Health St.', 'Metropolis', 'NY', '555-123-4567', 'contact@centralbb.org', 'Mon-Fri: 8AM-5PM', 40.7128, -74.0060),
 ('Community Blood Drive', '456 Wellness Ave.', 'Gotham', 'NJ', '555-987-6543', 'info@communitybd.org', 'Mon-Sat: 9AM-6PM', 40.7357, -74.1724);
 
 INSERT INTO health_tips (title, content, category) VALUES
 ('Stay Hydrated', 'Drink plenty of water before and after donation to help your body recover quickly.', 'BEFORE_DONATION'),
 ('Eat Iron-Rich Foods', 'Include foods like spinach, red meat, and beans in your diet to maintain healthy iron levels.', 'BEFORE_DONATION'),
 ('Rest Properly', 'Get a good night\'s sleep before donation and avoid strenuous activity for 24 hours after.', 'AFTER_DONATION');
+
+INSERT INTO blood_requests (hospital_name, blood_type, units_needed, urgency, request_date, contact_name, contact_phone, contact_email, status, notes)
+VALUES
+('City Hospital', 'A+', 2, 'HIGH', NOW(), 'Dr. Smith', '555-111-2222', 'smith@cityhospital.com', 'OPEN', 'Urgent need for surgery'),
+('Metro Clinic', 'O-', 1, 'CRITICAL', NOW(), 'Nurse Jane', '555-333-4444', 'jane@metroclinic.com', 'OPEN', 'Accident case'),
+('Red Cross Center', 'B+', 3, 'MEDIUM', NOW(), 'Coordinator Lee', '555-555-6666', 'lee@redcross.org', 'OPEN', 'Routine stock replenishment');
+
+-- Insert dummy donation history
+INSERT INTO donations (donor_id, center_id, donation_date, amount_ml, notes, status, created_at)
+VALUES
+  (1, 1, '2024-05-01 10:00:00', 450, 'First donation', 'COMPLETED', NOW()),
+  (1, 2, '2024-04-01 09:30:00', 450, 'Second donation', 'COMPLETED', NOW());
+  
+INSERT INTO appointments (donor_id, center_id, appointment_date, status, notes)
+VALUES
+(1, 1, DATE_ADD(NOW(), INTERVAL 2 DAY), 'SCHEDULED', 'First appointment'),
+(1, 2, DATE_ADD(NOW(), INTERVAL 10 DAY), 'SCHEDULED', 'Second appointment');

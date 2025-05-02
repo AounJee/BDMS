@@ -19,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final UserRepository userRepository;
+    private final CustomAuthSuccessHandler customAuthSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -57,7 +58,7 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login.html")
                 .loginProcessingUrl("/api/auth/login")
-                .defaultSuccessUrl("/user_dashboard.html", true)
+                .successHandler(customAuthSuccessHandler)
                 .failureUrl("/login.html?error=true")
             )
             .logout(logout -> logout

@@ -51,4 +51,7 @@ public class Donation {
 
     @Transient
     private String date;
+
+    @Transient
+    private String donorName;
 }

@@ -24,25 +24,25 @@
       <nav class="sidebar-nav">
         <ul>
           <li class="nav-item">
-            <a href="/admin_dashboard.html" class="nav-link">
+            <a href="admin_dashboard.html" class="nav-link">
               <i class="bi bi-speedometer2"></i>
               <span>Dashboard</span>
             </a>
           </li>
           <li class="nav-item">
-            <a href="/approve_requests.html" class="nav-link">
+            <a href="approve_requests.html" class="nav-link">
               <i class="bi bi-check-circle"></i>
               <span>Approve Requests</span>
             </a>
           </li>
           <li class="nav-item active">
-            <a href="/request_blood.html" class="nav-link">
+            <a href="request_blood.html" class="nav-link">
               <i class="bi bi-droplet"></i>
               <span>Request Blood</span>
             </a>
           </li>
           <li class="nav-item">
-            <a href="/donation_history.html" class="nav-link">
+            <a href="donation_history.html" class="nav-link">
               <i class="bi bi-clock-history"></i>
               <span>Donation History</span>
             </a>
@@ -50,11 +50,11 @@
         </ul>
       </nav>
       <div class="sidebar-footer">
-        <a href="/profile_settings.html" class="nav-link">
+        <a href="profile_settings.html" class="nav-link">
           <i class="bi bi-gear"></i>
           <span>Profile Settings</span>
         </a>
-        <a href="#logout" class="nav-link">
+        <a href="/BDMS-1/src/main/resources/static/login.html" class="nav-link">
           <i class="bi bi-box-arrow-right"></i>
           <span>Logout</span>
         </a>
@@ -82,6 +82,9 @@
           </div>
           <div class="card-body">
             <form id="request-blood-form">
+              <label for="hospital-name">Hospital Name</label>
+              <input type="text" id="hospital-name" required>
+
               <label for="blood-type">Blood Type</label>
               <select id="blood-type" required>
                 <option value="">Select Blood Type</option>
@@ -138,6 +141,6 @@
   </div>
 
   <script src="js/request_blood.js"></script>
-  <script src="js/sidebar.js"></script>
+  <script src="/admin/js/sidebar.js"></script>
 </body>
 </html>

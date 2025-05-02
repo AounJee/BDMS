@@ -45,11 +45,11 @@ public class AuthenticationService {
 
         userRepository.save(user);
 
-        var donor = Donor.builder()
-                .user(user)
-                .bloodType(request.getBloodType())
-                .eligibleToDonate(true)
-                .build();
+        var donor = new Donor();
+        donor.setUserId(user.getId());
+        donor.setBloodType(request.getBloodType());
+        donor.setEligibleToDonate(true);
+        donor.setTotalDonations(0);
 
         donorRepository.save(donor);
 

@@ -76,18 +76,9 @@
             <h1 class="page-title">Profile Settings</h1>
           </div>
           <div class="header-right">
-            <!-- <div class="search-bar">
-              <i class="bi bi-search"></i>
-              <input type="text" placeholder="Search...">
+            <div class="user-info">
+              <span class="user-name"></span>
             </div>
-            <div class="notifications">
-              <i class="bi bi-bell"></i>
-              <span class="badge">3</span>
-            </div>
-            <div class="user-profile">
-              <img id="profile-pic-header" src="/uploads/default-profile-pic.jpg" alt="User Profile" class="avatar">
-              <span class="user-name">John Doe</span>
-            </div> -->
           </div>
         </header>
 
@@ -100,13 +91,6 @@
             <div class="card-body">
               <div id="message" class="message"></div>
               <div class="profile-details">
-                <div class="profile-pic-section">
-                  <img id="profilePhoto" src="/uploads/default-profile-pic.jpg" alt="Profile Photo" class="large-avatar">
-                  <div>
-                    <label for="photoUpload" class="btn-schedule" style="margin-top: 0.5rem;">Upload New Photo</label>
-                    <input type="file" id="photoUpload" accept="image/*" style="display: none;">
-                  </div>
-                </div>
                 <div class="profile-info">
                   <div>
                     <label for="username">Username <span style="color: var(--danger);">*</span></label>
@@ -160,7 +144,7 @@
       </main>
     </div>
 
-    <script src="/static/js/auth_service.js"></script>
+    <script src="js/auth-service.js"></script>
     <script src="js/sidebar.js"></script>
     <script>
       let userId;
@@ -181,7 +165,7 @@
             throw new Error('Failed to fetch profile');
           }
           const data = await response.json();
-          userId = data.userId;
+          userId = data.id;
           document.getElementById('username').value = data.username || '';
           document.getElementById('email').value = data.email || '';
           document.getElementById('firstName').value = data.firstName || '';
@@ -189,26 +173,9 @@
           document.getElementById('bloodType').value = data.bloodType || '';
           document.getElementById('dob').value = data.dob || '';
           document.getElementById('gender').value = data.gender || '';
-          if (data.profilePicUrl) {
-            document.getElementById('profilePhoto').src = `/uploads/${data.profilePicUrl}`;
-            document.getElementById('profile-pic-header').src = `/uploads/${data.profilePicUrl}`;
-          }
-          document.querySelector('.user-name').textContent = `${data.firstName} ${data.lastName}`;
         } catch (error) {
           showMessage('Error loading profile: ' + error.message, 'error');
         }
-
-        // Add event listener for profile picture preview
-        document.getElementById('photoUpload').addEventListener('change', (event) => {
-          const file = event.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              document.getElementById('profilePhoto').src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-          }
-        });
       });
 
       // Update profile function with client-side validation
@@ -219,7 +186,6 @@
         const bloodType = document.getElementById('bloodType').value;
         const dob = document.getElementById('dob').value;
         const gender = document.getElementById('gender').value;
-        const photoFile = document.getElementById('photoUpload').files[0];
 
         // Client-side validation
         if (!username || !firstName || !lastName || !bloodType) {
@@ -227,21 +193,22 @@
           return;
         }
 
-        const formData = new FormData();
-        formData.append('username', username);
-        formData.append('firstName', firstName);
-        formData.append('lastName', lastName);
-        formData.append('bloodType', bloodType);
-        formData.append('dob', dob);
-        formData.append('gender', gender);
-        if (photoFile) {
-          formData.append('photo', photoFile);
-        }
+        const formData = {
+          username,
+          firstName,
+          lastName,
+          bloodType,
+          dob,
+          gender
+        };
 
         try {
           const response = await fetch(`/api/donors/${userId}/profile`, {
             method: 'PUT',
-            body: formData,
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData),
             credentials: 'include'
           });
           const result = await response.json();
@@ -249,10 +216,6 @@
             throw new Error(result.message || 'Failed to update profile');
           }
           showMessage('Profile updated successfully!', 'success');
-          if (result.profilePicUrl) {
-            document.getElementById('profilePhoto').src = `/uploads/${result.profilePicUrl}`;
-            document.getElementById('profile-pic-header').src = `/uploads/${result.profilePicUrl}`;
-          }
         } catch (error) {
           showMessage('Error updating profile: ' + error.message, 'error');
         }
@@ -261,22 +224,12 @@
       // Display success/error messages
       function showMessage(message, type) {
         const messageDiv = document.getElementById('message');
-        messageDiv.style.padding = '10px';
-        messageDiv.style.marginBottom = '20px';
-        messageDiv.style.borderRadius = '5px';
-        messageDiv.style.fontSize = '14px';
-        messageDiv.style.color = type === 'error' ? '#721c24' : '#155724';
-        messageDiv.style.backgroundColor = type === 'error' ? '#f8d7da' : '#d4edda';
         messageDiv.textContent = message;
+        messageDiv.className = `message ${type}`;
         setTimeout(() => {
           messageDiv.textContent = '';
-          messageDiv.style.padding = '';
-          messageDiv.style.marginBottom = '';
-          messageDiv.style.borderRadius = '';
-          messageDiv.style.fontSize = '';
-          messageDiv.style.color = '';
-          messageDiv.style.backgroundColor = '';
-        }, 5000);
+          messageDiv.className = 'message';
+        }, 3000);
       }
     </script>
   </body>

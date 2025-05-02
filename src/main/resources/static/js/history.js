@@ -39,10 +39,6 @@ function initUIComponents() {
         });
     });
 
-    document.querySelector('.notifications').addEventListener('click', () => {
-        alert('Notifications clicked!');
-    });
-
     document.querySelector('.user-profile').addEventListener('click', async (e) => {
         e.preventDefault();
         await AuthService.logout();

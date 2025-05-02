@@ -34,7 +34,7 @@ public class AppointmentService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Donor donor = donorRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new RuntimeException("Donor not found"));
-        if (!donor.isEligibleToDonate()) {
+        if (!donor.getEligibleToDonate()) {
             throw new RuntimeException("Donor is not eligible to donate at this time");
         }
         Appointment appointment = new Appointment();
@@ -74,5 +74,10 @@ public class AppointmentService {
         }
         appointment.setStatus("CANCELLED");
         appointmentRepository.save(appointment);
+    }
+
+    public long countUpcomingAppointments() {
+        // Example: count all appointments with status "SCHEDULED" and date in the future
+        return appointmentRepository.countByStatusAndAppointmentDateAfter("SCHEDULED", java.time.LocalDateTime.now());
     }
 }

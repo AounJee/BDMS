@@ -76,18 +76,9 @@
             <h1 class="page-title">Dashboard</h1>
           </div>
           <div class="header-right">
-            <!-- <div class="search-bar">
-              <i class="bi bi-search"></i>
-              <input type="text" placeholder="Search...">
-            </div> -->
-            <!-- <div class="notifications">
-              <i class="bi bi-bell"></i>
-              <span class="badge">3</span>
-            </div> -->
-            <!-- <div class="user-profile">
-              <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User Profile" class="avatar">
-              <span class="user-name">John Doe</span>
-            </div> -->
+            <div class="user-profile">
+                <span class="user-name">John Doe</span>
+            </div>
           </div>
         </header>
 
@@ -167,7 +158,7 @@
             <div class="card requests-card">
               <div class="card-header">
                 <h2>Urgent Blood Requests</h2>
-                <a href="#all-requests" class="view-all">View All</a>
+                <a href="donate_blood.html" class="view-all">View All</a>
               </div>
               <div class="card-body">
                 <div class="blood-request">
@@ -196,7 +187,7 @@
           <div class="card donation-history-card">
             <div class="card-header">
               <h2>Recent Donation History</h2>
-              <a href="#full-history" class="view-all">View Full History</a>
+              <a href="./history.html" class="view-all">View Full History</a>
             </div>
             <div class="card-body">
               <table class="donation-table">
@@ -278,4 +269,61 @@
     <script src="js/user_dashboard.js"></script>
     <script src = "js/auth-service.js"></script>
     <script src="js/sidebar.js"></script>
+    <script>
+      try {
+        if (localStorage.getItem('isSidebarCollapsed') === 'true') {
+          document.documentElement.classList.add('sidebar-collapsed-init');
+        }
+      } catch (e) {}
+    </script>
+    <script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const response = await fetch('/api/donors/me/profile', { credentials: 'include' });
+      if (!response.ok) return;
+      const data = await response.json();
+      const userNameElem = document.querySelector('.user-name');
+      if (userNameElem) {
+        userNameElem.textContent = data.username || `${data.firstName} ${data.lastName}`;
+      }
+    } catch (e) {
+      // Optionally handle error
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.getElementById('sidebar');
+  const sidebarToggle = document.getElementById('sidebar-toggle');
+  const sidebarToggleDesktop = document.getElementById('sidebar-toggle-desktop');
+  const mainContent = document.querySelector('.main-content');
+
+  // Load the sidebar state from localStorage
+    const isCollapsed = localStorage.getItem('isSidebarCollapsed') === 'true';
+    if (isCollapsed) {
+      sidebar.classList.add('collapsed');
+      mainContent.classList.add('sidebar-collapsed');
+    } else {
+      sidebar.classList.remove('collapsed');
+      mainContent.classList.remove('sidebar-collapsed');
+    }
+
+  // Toggle sidebar on mobile
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      mainContent.classList.toggle('sidebar-collapsed');
+      localStorage.setItem('isSidebarCollapsed', sidebar.classList.contains('collapsed'));
+    });
+  }
+
+  // Toggle sidebar on desktop
+  if (sidebarToggleDesktop) {
+    sidebarToggleDesktop.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      mainContent.classList.toggle('sidebar-collapsed');
+      localStorage.setItem('isSidebarCollapsed', sidebar.classList.contains('collapsed'));
+    });
+  }
+});
+</script>
 </html>

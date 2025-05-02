@@ -27,7 +27,12 @@ class AuthService {
 }
 
 // Add logout handler
-document.querySelector('.nav-link[href="#logout"]').addEventListener('click', (e) => {
-    e.preventDefault();
-    AuthService.logout();
+document.addEventListener('DOMContentLoaded', () => {
+    const logoutLink = document.querySelector('.sidebar-footer .nav-link:last-child');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            AuthService.logout();
+        });
+    }
 });

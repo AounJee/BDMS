@@ -47,26 +47,26 @@ function initUIComponents() {
                 link.closest('.nav-item').classList.add('active');
                 
                 const linkText = link.querySelector('span').textContent;
-                document.querySelector('.page-title').textContent = linkText;
+                const pageTitle = document.querySelector('.page-title');
+                if (pageTitle) pageTitle.textContent = linkText;
             }
         });
     });
 
-    document.querySelector('.notifications').addEventListener('click', () => {
-        alert('Notifications clicked!');
-    });
-
-    document.querySelector('.user-profile').addEventListener('click', async (e) => {
-        e.preventDefault();
-        await AuthService.logout();
-    });
+    const userProfile = document.querySelector('.user-profile');
+    if (userProfile) {
+        userProfile.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await AuthService.logout();
+        });
+    }
 }
 
 // Populate user profile information
 function populateUserProfile(user) {
-    document.querySelector('.user-name').textContent = user.username || `${user.firstName} ${user.lastName}`;
-    if (user.profilePicUrl) {
-        document.getElementById('profile-pic-header').src = user.profilePicUrl;
+    const userNameElem = document.querySelector('.user-name');
+    if (userNameElem) {
+        userNameElem.textContent = user.username || `${user.firstName} ${user.lastName}`;
     }
 }
 
@@ -203,12 +203,7 @@ async function loadAppointments(userId) {
             });
         });
 
-        document.querySelectorAll('.btn-cancel').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const appointmentId = e.target.getAttribute('data-appointment-id');
-                await cancelAppointment(appointmentId);
-            });
-        });
+        setupCancelButtons();
     } catch (error) {
         console.error('Error loading appointments:', error);
         appointmentsList.innerHTML = '<p>Failed to load appointments.</p>';
@@ -243,16 +238,77 @@ async function rescheduleAppointment(appointmentId) {
     alert(`Reschedule appointment ${appointmentId} - Implement modal for date selection`);
 }
 
-// Cancel appointment
-async function cancelAppointment(appointmentId) {
+// Modal HTML for confirmation
+function createCancelModal() {
+    let modal = document.getElementById('cancel-modal');
+    if (modal) return modal;
+    modal = document.createElement('div');
+    modal.id = 'cancel-modal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.background = 'rgba(0,0,0,0.25)';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.zIndex = '9999';
+    modal.innerHTML = `
+      <div style="background:#fff;padding:2rem 2.5rem;border-radius:18px;box-shadow:0 2px 16px rgba(44,62,80,0.13);text-align:center;min-width:320px;">
+        <h2 style="margin-bottom:1.2rem;font-size:1.2rem;">Are you sure you want to cancel this appointment?</h2>
+        <div style="display:flex;gap:1.5rem;justify-content:center;">
+          <button id="modal-cancel-yes" style="background:#ff4d67;color:#fff;border:none;border-radius:999px;padding:0.7rem 2.2rem;font-weight:700;font-size:1rem;cursor:pointer;">Yes</button>
+          <button id="modal-cancel-no" style="background:#f5f6fa;color:#222;border:none;border-radius:999px;padding:0.7rem 2.2rem;font-weight:700;font-size:1rem;cursor:pointer;">No</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
+}
+
+// Override cancel button logic
+function setupCancelButtons() {
+    document.querySelectorAll('.btn-cancel').forEach(btn => {
+        // Remove any previous event listeners by cloning the node
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        newBtn.addEventListener('click', (e) => {
+            const appointmentId = newBtn.getAttribute('data-appointment-id');
+            showCancelModal(appointmentId);
+        });
+    });
+}
+
+function showCancelModal(appointmentId) {
+    const modal = createCancelModal();
+    modal.style.display = 'flex';
+    // Remove previous listeners by replacing the buttons
+    const yesBtn = document.getElementById('modal-cancel-yes').cloneNode(true);
+    const noBtn = document.getElementById('modal-cancel-no').cloneNode(true);
+    document.getElementById('modal-cancel-yes').replaceWith(yesBtn);
+    document.getElementById('modal-cancel-no').replaceWith(noBtn);
+    yesBtn.onclick = async function() {
+        await cancelAppointmentAndMove(appointmentId);
+        modal.style.display = 'none';
+    };
+    noBtn.onclick = function() {
+        modal.style.display = 'none';
+    };
+}
+
+// Cancel appointment and move back to requests
+async function cancelAppointmentAndMove(appointmentId) {
     try {
         const response = await fetch(`/api/appointments/${appointmentId}`, {
             method: 'DELETE',
             credentials: 'include'
         });
         if (response.ok) {
+            // Optionally, POST to /api/blood-requests/reopen or similar if needed
             alert('Appointment cancelled successfully');
             await loadAppointments();
+            await loadBloodRequests();
         } else {
             alert('Failed to cancel appointment');
         }

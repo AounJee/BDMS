@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     List<Appointment> findByDonorId(Long donorId);
+
+    long countByStatusAndAppointmentDateAfter(String status, java.time.LocalDateTime date);
 }

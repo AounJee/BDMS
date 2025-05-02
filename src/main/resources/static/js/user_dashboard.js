@@ -1,6 +1,6 @@
 const navLinks = document.querySelectorAll('.nav-link');
 
-// Auth Check and Data Loading
+// Wait for DOM to be fully loaded before initializing
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const user = await AuthService.checkAuth();
@@ -8,62 +8,104 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error('Not authenticated');
         }
 
+        // Initialize everything only after authentication is successful
+        initializeNavigation();
         populateUserProfile(user);
         await loadDashboardData(user.id);
     } catch (error) {
         console.error('Auth check failed:', error);
         setTimeout(() => {
             window.location.href = '/login.html';
-        }, 5000);
+        }, 2000);
     }
-
-    initUIComponents();
 });
 
-// Initialize all UI components
-function initUIComponents() {
-    navLinks.forEach(link => {
+// Initialize navigation and sidebar functionality
+function initializeNavigation() {
+    // Sidebar toggle functionality
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebarToggleDesktop = document.getElementById('sidebar-toggle-desktop');
+    const sidebar = document.getElementById('sidebar');
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar?.classList.toggle('collapsed');
+        });
+    }
+
+    if (sidebarToggleDesktop) {
+        sidebarToggleDesktop.addEventListener('click', () => {
+            sidebar?.classList.toggle('collapsed');
+        });
+    }
+
+    // Navigation link handling
+    document.querySelectorAll('.nav-item .nav-link').forEach(link => {
+        if (!link) return;
+        
         link.addEventListener('click', (e) => {
-            if (link.getAttribute('href').startsWith('#')) {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('#')) {
                 e.preventDefault();
                 
+                // Remove active class from all nav items
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.classList.remove('active');
                 });
                 
-                link.closest('.nav-item').classList.add('active');
+                // Add active class to clicked nav item
+                const navItem = link.closest('.nav-item');
+                if (navItem) {
+                    navItem.classList.add('active');
+                }
                 
-                const linkText = link.querySelector('span').textContent;
-                document.querySelector('.page-title').textContent = linkText;
+                // Update page title
+                const span = link.querySelector('span');
+                const pageTitle = document.querySelector('.page-title');
+                if (span && pageTitle) {
+                    pageTitle.textContent = span.textContent;
+                }
             }
         });
     });
 
+    // Action buttons
     document.querySelectorAll('.btn-respond, .btn-reschedule, .btn-cancel, .btn-schedule').forEach(btn => {
+        if (!btn) return;
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             alert(`${e.target.textContent} button clicked!`);
         });
     });
-
-    document.querySelector('.notifications').addEventListener('click', () => {
-        alert('Notifications clicked!');
-    });
-
-    document.querySelector('.user-profile').addEventListener('click', async (e) => {
-        e.preventDefault();
-        await AuthService.logout();
-    });
 }
 
 // Populate user profile information
 function populateUserProfile(user) {
-    document.querySelector('.user-name').textContent = `${user.firstName} ${user.lastName}`;
+    if (!user) return;
+
+    const pageTitle = document.querySelector('.page-title');
+    if (pageTitle) {
+        pageTitle.textContent = 'Dashboard';
+    }
 }
 
 // Load dashboard data from API
 async function loadDashboardData(userId) {
+    if (!userId) return;
+
     try {
+        // First get the user's profile to get their donor information
+        const profileResponse = await fetch('/api/donors/me/profile', { 
+            credentials: 'include' 
+        });
+
+        if (!profileResponse.ok) {
+            throw new Error('Failed to load profile data');
+        }
+
+        const profile = await profileResponse.json();
+        userId = profile.id; // Get the correct user ID from profile
+
         const [statsResponse, appointmentsResponse] = await Promise.all([
             fetch(`/api/donors/${userId}/stats`, { credentials: 'include' }),
             fetch(`/api/appointments/me`, { credentials: 'include' })
@@ -76,26 +118,98 @@ async function loadDashboardData(userId) {
         const stats = await statsResponse.json();
         const appointments = await appointmentsResponse.json();
 
-        document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = stats.bloodType;
-        document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = stats.lastDonationText;
-        document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = stats.totalDonations;
-        document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = stats.nextEligibleText;
+        // Format the last donation date
+        const lastDonationText = stats.lastDonationDate ? 
+            formatLastDonationDate(new Date(stats.lastDonationDate)) : 'Never';
 
-        if (appointments.length > 0) {
-            const nextAppointment = appointments[0];
-            const centerResponse = await fetch(`/api/donation-centers/${nextAppointment.centerId}`, { credentials: 'include' });
-            const center = await centerResponse.json();
-            const date = new Date(nextAppointment.appointmentDate);
-            document.querySelector('.appointment-info h3').textContent = 'Blood Donation Appointment';
-            document.querySelector('.appointment-info p:nth-of-type(1)').innerHTML = 
-                `<i class="bi bi-clock"></i> ${date.toLocaleTimeString()}`;
-            document.querySelector('.appointment-info p:nth-of-type(2)').innerHTML = 
-                `<i class="bi bi-geo-alt"></i> ${center.name}`;
-        }
+        // Format next eligible date
+        const nextEligibleText = calculateNextEligible(stats.lastDonationDate);
+
+        const formattedStats = {
+            bloodType: stats.bloodType || 'N/A',
+            lastDonationText: lastDonationText,
+            totalDonations: stats.totalDonations || 0,
+            nextEligibleText: nextEligibleText
+        };
+
+        updateDashboardStats(formattedStats);
+        updateAppointmentInfo(appointments);
     } catch (error) {
         console.error('Error loading dashboard data:', error);
         useSampleData();
     }
+}
+
+// Format last donation date
+function formatLastDonationDate(lastDonationDate) {
+    const now = new Date();
+    const diffTime = Math.abs(now - lastDonationDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 30) {
+        return `${diffDays} days ago`;
+    } else {
+        const months = Math.floor(diffDays / 30);
+        return `${months} months ago`;
+    }
+}
+
+// Calculate next eligible date
+function calculateNextEligible(lastDonationDate) {
+    if (!lastDonationDate) {
+        return 'Eligible now';
+    }
+
+    const lastDonation = new Date(lastDonationDate);
+    const nextEligible = new Date(lastDonation);
+    nextEligible.setDate(nextEligible.getDate() + 56); // 56 days = 8 weeks
+
+    const now = new Date();
+    const diffTime = nextEligible - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 0) {
+        return 'Eligible now';
+    } else {
+        return `${diffDays} days`;
+    }
+}
+
+// Update dashboard statistics
+function updateDashboardStats(stats) {
+    const statElements = {
+        bloodType: document.querySelector('.stat-card:nth-child(1) .stat-value'),
+        lastDonation: document.querySelector('.stat-card:nth-child(2) .stat-value'),
+        totalDonations: document.querySelector('.stat-card:nth-child(3) .stat-value'),
+        nextEligible: document.querySelector('.stat-card:nth-child(4) .stat-value')
+    };
+
+    if (statElements.bloodType) statElements.bloodType.textContent = stats.bloodType || 'N/A';
+    if (statElements.lastDonation) statElements.lastDonation.textContent = stats.lastDonationText || 'Never';
+    if (statElements.totalDonations) statElements.totalDonations.textContent = stats.totalDonations || '0';
+    if (statElements.nextEligible) statElements.nextEligible.textContent = stats.nextEligibleText || 'N/A';
+}
+
+// Update appointment information
+function updateAppointmentInfo(appointments) {
+    const appointmentsList = document.getElementById('appointments-list');
+    if (!appointmentsList) return;
+
+    if (!appointments || appointments.length === 0) {
+        appointmentsList.innerHTML = '<li class="no-appointments">No upcoming appointments</li>';
+        return;
+    }
+
+    appointmentsList.innerHTML = appointments
+        .map(appointment => `
+            <li class="appointment-item">
+                <div class="appointment-date">${new Date(appointment.appointmentDate).toLocaleDateString()}</div>
+                <div class="appointment-time">${new Date(appointment.appointmentDate).toLocaleTimeString()}</div>
+                <div class="appointment-location">${appointment.center.name}</div>
+                <div class="appointment-status ${appointment.status.toLowerCase()}">${appointment.status}</div>
+            </li>
+        `)
+        .join('');
 }
 
 // Fallback to sample data
@@ -107,8 +221,13 @@ function useSampleData() {
         nextEligibleText: '45 days'
     };
 
-    document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = sampleStats.bloodType;
-    document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = sampleStats.lastDonationText;
-    document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = sampleStats.totalDonations;
-    document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = sampleStats.nextEligibleText;
+    updateDashboardStats(sampleStats);
+    
+    const sampleAppointments = [{
+        appointmentDate: new Date(),
+        center: { name: 'Sample Blood Bank' },
+        status: 'SCHEDULED'
+    }];
+    
+    updateAppointmentInfo(sampleAppointments);
 }
