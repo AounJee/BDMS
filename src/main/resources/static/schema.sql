@@ -135,7 +135,7 @@ INSERT INTO donation_centers (name, address, city, state, phone, email, operatin
 ('Community Blood Drive', '456 Wellness Ave.', 'Gotham', 'NJ', '555-987-6543', 'info@communitybd.org', 'Mon-Sat: 9AM-6PM', 40.7357, -74.1724);
 
 select* from donation_centers;
-
+select * from health_tips;
 INSERT INTO health_tips (title, content, category) VALUES
 ('Stay Hydrated', 'Drink plenty of water before and after donation to help your body recover quickly.', 'BEFORE_DONATION'),
 ('Eat Iron-Rich Foods', 'Include foods like spinach, red meat, and beans in your diet to maintain healthy iron levels.', 'BEFORE_DONATION'),

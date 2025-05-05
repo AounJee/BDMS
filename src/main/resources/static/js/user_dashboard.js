@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadDashboardData(user.id);
         await loadUrgentRequests();
         await loadRecentDonations();
+        await loadHealthTips();
 
         // Poll for updates every 30 seconds
         setInterval(async () => {
@@ -112,17 +113,32 @@ async function loadDashboardData(userId) {
         const profile = await profileResponse.json();
         userId = profile.id; // Get the correct user ID from profile
 
-        const [statsResponse, appointmentsResponse] = await Promise.all([
-            fetch(`/api/donors/${userId}/stats`, { credentials: 'include' }),
-            fetch(`/api/appointments/me`, { credentials: 'include' })
-        ]);
+        // Get donor stats
+        const statsResponse = await fetch(`/api/donors/${userId}/stats`, { 
+            credentials: 'include' 
+        });
 
-        if (!statsResponse.ok || !appointmentsResponse.ok) {
-            throw new Error('Failed to load dashboard data');
+        if (!statsResponse.ok) {
+            throw new Error('Failed to load donor stats');
         }
 
         const stats = await statsResponse.json();
-        const appointments = await appointmentsResponse.json();
+
+        // Log for debugging
+        console.log('Profile:', profile);
+        console.log('Stats:', stats);
+
+        // Get total donations by counting the user's donations
+        let totalDonations = 0;
+        try {
+            const donationsResponse = await fetch('/api/donations/me', { credentials: 'include' });
+            if (donationsResponse.ok) {
+                const donations = await donationsResponse.json();
+                totalDonations = Array.isArray(donations) ? donations.length : 0;
+            }
+        } catch (e) {
+            console.warn('Could not fetch donations for total count:', e);
+        }
 
         // Format the last donation date
         const lastDonationText = stats.lastDonationDate ? 
@@ -132,13 +148,25 @@ async function loadDashboardData(userId) {
         const nextEligibleText = calculateNextEligible(stats.lastDonationDate);
 
         const formattedStats = {
-            bloodType: stats.bloodType || 'N/A',
+            bloodType: profile.bloodType || 'N/A',
             lastDonationText: lastDonationText,
-            totalDonations: stats.totalDonations || 0,
+            totalDonations: totalDonations,
             nextEligibleText: nextEligibleText
         };
 
         updateDashboardStats(formattedStats);
+
+        // Get appointments
+        const appointmentsResponse = await fetch('/api/appointments/me', { 
+            credentials: 'include' 
+        });
+
+        if (!appointmentsResponse.ok) {
+            throw new Error('Failed to load appointments');
+        }
+
+        const appointments = await appointmentsResponse.json();
+        console.log('Appointments:', appointments);
         updateAppointmentInfo(appointments);
     } catch (error) {
         console.error('Error loading dashboard data:', error);
@@ -198,24 +226,48 @@ function updateDashboardStats(stats) {
 
 // Update appointment information
 function updateAppointmentInfo(appointments) {
-    const appointmentsList = document.getElementById('appointments-list');
-    if (!appointmentsList) return;
+    const nextAppointmentDiv = document.getElementById('next-appointment');
+    if (!nextAppointmentDiv) return;
 
     if (!appointments || appointments.length === 0) {
-        appointmentsList.innerHTML = '<li class="no-appointments">No upcoming appointments</li>';
+        nextAppointmentDiv.innerHTML = `
+            <div class="no-appointment">
+                <p>No upcoming appointments</p>
+            </div>
+        `;
         return;
     }
 
-    appointmentsList.innerHTML = appointments
-        .map(appointment => `
-            <li class="appointment-item">
-                <div class="appointment-date">${new Date(appointment.appointmentDate).toLocaleDateString()}</div>
-                <div class="appointment-time">${new Date(appointment.appointmentDate).toLocaleTimeString()}</div>
-                <div class="appointment-location">${appointment.center.name}</div>
-                <div class="appointment-status ${appointment.status.toLowerCase()}">${appointment.status}</div>
-            </li>
-        `)
-        .join('');
+    // Sort appointments by date and get the next one
+    const nextAppointment = appointments
+        .filter(apt => apt && apt.appointmentDate && new Date(apt.appointmentDate) > new Date())
+        .sort((a, b) => new Date(a.appointmentDate) - new Date(b.appointmentDate))[0];
+
+    if (!nextAppointment) {
+        nextAppointmentDiv.innerHTML = `
+            <div class="no-appointment">
+                <p>No upcoming appointments</p>
+            </div>
+        `;
+        return;
+    }
+
+    const appointmentDate = new Date(nextAppointment.appointmentDate);
+    const centerName = nextAppointment.center && nextAppointment.center.name ? nextAppointment.center.name : 'Unknown Center';
+    const status = nextAppointment.status || '';
+    nextAppointmentDiv.innerHTML = `
+        <div class="appointment-details">
+            <div class="appointment-info">
+                <h3>${centerName}</h3>
+                <p>${appointmentDate.toLocaleDateString()} at ${appointmentDate.toLocaleTimeString()}</p>
+                <p class="status ${status.toLowerCase()}">${status}</p>
+            </div>
+            <div class="appointment-actions">
+                <button class="btn-reschedule" onclick="window.location.href='donate_blood.html'">Reschedule</button>
+                <button class="btn-cancel" onclick="cancelAppointment(${nextAppointment.id})">Cancel</button>
+            </div>
+        </div>
+    `;
 }
 
 // Fallback to sample data
@@ -238,25 +290,33 @@ function useSampleData() {
     updateAppointmentInfo(sampleAppointments);
 }
 
-// Load urgent blood requests
+// Load urgent blood requests (only CRITICAL urgency)
 async function loadUrgentRequests() {
     try {
-        const response = await fetch('/api/blood-requests', { credentials: 'include' });
+        const response = await fetch('/api/blood-requests', { 
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
         if (!response.ok) {
             throw new Error('Failed to load blood requests');
         }
 
         const requests = await response.json();
         const urgentRequestsList = document.getElementById('urgent-requests-list');
+        if (!urgentRequestsList) return;
+        
         urgentRequestsList.innerHTML = '';
 
-        // Filter for urgent requests (High or Critical urgency)
-        const urgentRequests = requests.filter(request => 
-            request.urgency === 'HIGH' || request.urgency === 'CRITICAL'
-        ).slice(0, 3); // Show only top 3 urgent requests
+        // Filter for only CRITICAL urgency
+        const urgentRequests = requests
+            .filter(request => request.urgency === 'CRITICAL')
+            .slice(0, 3); // Show only top 3 critical requests
 
         if (urgentRequests.length === 0) {
-            urgentRequestsList.innerHTML = '<p>No urgent blood requests at the moment.</p>';
+            urgentRequestsList.innerHTML = '<p>No critical blood requests at the moment.</p>';
             return;
         }
 
@@ -277,8 +337,10 @@ async function loadUrgentRequests() {
         });
     } catch (error) {
         console.error('Error loading urgent requests:', error);
-        document.getElementById('urgent-requests-list').innerHTML = 
-            '<p>Failed to load urgent requests.</p>';
+        const urgentRequestsList = document.getElementById('urgent-requests-list');
+        if (urgentRequestsList) {
+            urgentRequestsList.innerHTML = '<p>Failed to load urgent requests.</p>';
+        }
     }
 }
 
@@ -321,4 +383,68 @@ async function loadRecentDonations() {
         document.getElementById('recent-donations-list').innerHTML = 
             '<tr><td colspan="5">Failed to load donation history.</td></tr>';
     }
+}
+
+// Load health tips
+async function loadHealthTips() {
+    try {
+        const response = await fetch('/api/health-tips', { credentials: 'include' });
+        if (!response.ok) {
+            throw new Error('Failed to load health tips');
+        }
+
+        const tips = await response.json();
+        const tipsContainer = document.getElementById('health-tips-list');
+        tipsContainer.innerHTML = '';
+
+        if (tips.length === 0) {
+            tipsContainer.innerHTML = '<p>No health tips available.</p>';
+            return;
+        }
+
+        tips.forEach(tip => {
+            const tipDiv = document.createElement('div');
+            tipDiv.classList.add('health-tip');
+            tipDiv.innerHTML = `
+                <div class="tip-icon">
+                    <i class="bi bi-heart-pulse"></i>
+                </div>
+                <div class="tip-content">
+                    <h3>${tip.title}</h3>
+                    <p>${tip.content}</p>
+                </div>
+            `;
+            tipsContainer.appendChild(tipDiv);
+        });
+    } catch (error) {
+        console.error('Error loading health tips:', error);
+        useSampleHealthTips();
+    }
+}
+
+// Fallback to sample health tips
+function useSampleHealthTips() {
+    const sampleTips = [
+        { title: 'Stay Hydrated', content: 'Drink plenty of water before and after donation to help your body recover quickly.' },
+        { title: 'Eat Iron-Rich Foods', content: 'Include foods like spinach, red meat, and beans in your diet to maintain healthy iron levels.' },
+        { title: 'Rest Properly', content: 'Get a good night\'s sleep before donation and avoid strenuous activity for 24 hours after.' }
+    ];
+
+    const tipsContainer = document.getElementById('health-tips-list');
+    tipsContainer.innerHTML = '';
+
+    sampleTips.forEach(tip => {
+        const tipDiv = document.createElement('div');
+        tipDiv.classList.add('health-tip');
+        tipDiv.innerHTML = `
+            <div class="tip-icon">
+                <i class="bi bi-heart-pulse"></i>
+            </div>
+            <div class="tip-content">
+                <h3>${tip.title}</h3>
+                <p>${tip.content}</p>
+            </div>
+        `;
+        tipsContainer.appendChild(tipDiv);
+    });
 }
